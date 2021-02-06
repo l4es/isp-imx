@@ -1,0 +1,84 @@
+{
+  "caseConfig":{
+      "ID"  : "1015",
+      "path": "baseline",
+      "name": "1015_CAC.enable.image.mp",
+      "desc": "Enable CAC for mp with RAW8 image input.",
+      "ver" : "0.8.0",
+
+      "engineConfig":[
+          {
+              "engine": {
+                  "type": 2,
+
+                  "mainPathConfig":{
+                      "width"  : 1920 ,
+                      "height" : 1080 ,
+                      "mode"   : 4 ,
+                      "layout" : 2
+                  },
+
+                  "selfPathConfig":{
+                      "width"  : 0 ,
+                      "height" : 0 ,
+                      "mode"   : 1 ,
+                      "layout" : 2
+                  }
+              },
+
+              "verifyCurFrame"        : 1 ,
+              "frameNum"              : 1 ,
+              "enableCAC"             : 1 ,
+              "CacXNs"                : 6 ,
+              "CacXNf"                : 29 ,
+              "CacYNs"                : 6 ,
+              "CacYNf"                : 29 ,
+              "CacARed"               : -0.5625 ,
+              "CacBRed"               : -2.25 ,
+              "CacCRed"               : 1.875 ,
+              "CacABlue"              : 0 ,
+              "CacBBlue"              : -0.0625 ,
+              "CacCBlue"              : 0.0625 ,
+              "CacHClip"              : 1 ,
+              "CacVClip"              : 3 ,
+              "CacHCenterOffset"      : 0 ,
+              "CacVCenterOffset"      : 0 ,
+              "enableTPG"             : 1 ,
+              "imageType"             : 1 ,
+              "bayerPattern"          : 0 ,
+              "colorDepth"            : 0 ,
+              "resolution"            : 0 ,
+              "pixleGap"              : 960 ,
+              "lineGap"               : 360 ,
+              "gapStandard"           : 240 ,
+              "randomSeed"            : 2863311530 ,
+              "h_total"               : 2844 ,
+              "h_fp"                  : 308 ,
+              "h_bp"                  : 308 ,
+              "h_w"                   : 308 ,
+              "h_act"                 : 1920 ,
+              "v_total"               : 1968 ,
+              "v_fp"                  : 5 ,
+              "v_bp"                  : 881 ,
+              "v_w"                   : 2 ,
+              "v_act"                 : 1080 ,
+
+              "input":{
+                  "goldenFiles": [
+                        {"fileName": "1015_CAC.enable.image.mp.00.ppm"}
+                  ],
+                  "images": [
+                      {"fileName": "RAW8_20100101_005155.pgm"}
+                  ]
+              },
+
+              "output":{
+                  "images": [
+                        {"fileName": "1015_CAC.enable.image.mp.00"}
+                  ]
+              }
+
+          }
+      ]
+  }
+}

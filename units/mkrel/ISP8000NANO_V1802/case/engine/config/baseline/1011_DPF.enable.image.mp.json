@@ -1,0 +1,87 @@
+{
+  "caseConfig":{
+      "ID"  : "1011",
+      "path": "baseline",
+      "name": "1011_DPF.enable.image.mp",
+      "desc": "enable DPF for mp with RAW8 image input.",
+      "ver" : "0.8.0",
+
+      "engineConfig":[
+          {
+              "engine": {
+                  "type": 2,
+
+                  "mainPathConfig":{
+                      "width"  : 1920 ,
+                      "height" : 1080 ,
+                      "mode"   : 4 ,
+                      "layout" : 2
+                  },
+
+                  "selfPathConfig":{
+                      "width"  : 0 ,
+                      "height" : 0 ,
+                      "mode"   : 1 ,
+                      "layout" : 2
+                  }
+              },
+
+              "verifyCurFrame"        : 1 ,
+              "frameNum"              : 1 ,
+              "enableDPF"             : 1 ,
+              "?DpfFilter" : "0-disable, 1-9x9, 2-13x9",
+              "?DpfGainUsage": "1-disable, 2-nf, 3-lsc, 4-nf_lsc, 5-awb, 6-awb_lsc",
+              "?DpfStrength": "0-255",
+              "?DpfWeightG" : "0-255",
+              "?DpfDenoiseTable": "0-1023, decreasing sequence",
+              "?DpfXScale": "0-linear, 1-log",
+              "?DpfNFGain": "0-4096",
+              "DpfFilter"             : 1 ,
+              "DpfGainUsage"          : 1 ,
+              "DpfStrength"           : [127, 255, 127],
+              "DpfWeightG"            : [127, 127, 127, 127, 127, 127],
+              "DpfWeightRB"           : [127, 127, 127, 127, 127, 127],
+              "DpfDenoiseTable"       : [418, 418, 418, 417, 380, 328, 293, 267, 247, 217, 196, 181, 157, 142, 130, 121, 113],
+              "DpfXScale"             : 1,
+              "DpfNFGain"             : [0, 0, 0, 0],
+              "DpfFilterOff"          : [0, 0, 0, 0],
+              "enableTPG"             : 1 ,
+              "imageType"             : 2 ,
+              "bayerPattern"          : 0 ,
+              "colorDepth"            : 0 ,
+              "resolution"            : 0 ,
+              "pixleGap"              : 960 ,
+              "lineGap"               : 360 ,
+              "gapStandard"           : 240 ,
+              "randomSeed"            : 2863311530 ,
+              "h_total"               : 2844 ,
+              "h_fp"                  : 308 ,
+              "h_bp"                  : 308 ,
+              "h_w"                   : 308 ,
+              "h_act"                 : 1920 ,
+              "v_total"               : 1968 ,
+              "v_fp"                  : 5 ,
+              "v_bp"                  : 881 ,
+              "v_w"                   : 2 ,
+              "v_act"                 : 1080 ,
+
+
+              "input":{
+                  "goldenFiles": [
+                        {"fileName": "1011_DPF.enable.image.mp.00.ppm"}
+                  ],
+                  "images": [
+                      {"fileName": "RAW8_20100101_005155.pgm"}
+                  ]
+              },
+
+              "output":{
+                  "images": [
+                        {"fileName": "1011_DPF.enable.image.mp.00"}
+                  ]
+              }
+
+          }
+      ]
+  }
+}

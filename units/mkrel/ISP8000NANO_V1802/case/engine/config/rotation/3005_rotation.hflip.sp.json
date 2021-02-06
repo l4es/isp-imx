@@ -1,0 +1,70 @@
+{
+  "caseConfig":{
+      "ID"  : "3005",
+      "path": "rotation",
+      "name": "3005_rotation.hflip.sp",
+      "desc": "rotation horizontal flip in SP.",
+      "ver" : "0.8.0",
+
+      "engineConfig":[
+          {
+              "engine": {
+                  "type": 2,
+
+                  "mainPathConfig":{
+                      "width"  : 0 ,
+                      "height" : 0 ,
+                      "mode"   : 1 ,
+                      "layout" : 2
+                  },
+
+                  "selfPathConfig":{
+                      "width"  : 1920 ,
+                      "height" : 1080 ,
+                      "mode"   : 4 ,
+                      "layout" : 2
+                  }
+              },
+
+              "verifyCurFrame"        : 1 ,
+              "frameNum"              : 1 ,
+              "rotateAngle"           : 3 ,
+              "enableTPG"             : 1 ,
+              "imageType"             : 4 ,
+              "bayerPattern"          : 0 ,
+              "colorDepth"            : 0 ,
+              "resolution"            : 0 ,
+              "pixleGap"              : 360 ,
+              "lineGap"               : 640 ,
+              "gapStandard"           : 240 ,
+              "randomSeed"            : 2863311530 ,
+              "h_total"               : 2844 ,
+              "h_fp"                  : 308 ,
+              "h_bp"                  : 308 ,
+              "h_w"                   : 308 ,
+              "h_act"                 : 1920 ,
+              "v_total"               : 1968 ,
+              "v_fp"                  : 5 ,
+              "v_bp"                  : 881 ,
+              "v_w"                   : 2 ,
+              "v_act"                 : 1080 ,
+
+              "input":{
+                  "goldenFiles": [
+                        {"fileName": "3005_rotation.hflip.sp.00.ppm"}
+                  ],
+                  "images": [
+                      {"fileName": "RAW8_20100101_005155.pgm"}
+                  ]
+              },
+
+              "output":{
+                  "images": [
+                        {"fileName": "3005_rotation.hflip.sp.00"}
+                  ]
+              }
+
+          }
+      ]
+  }
+}

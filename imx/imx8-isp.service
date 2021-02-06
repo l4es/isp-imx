@@ -1,0 +1,17 @@
+# (c) Basler 2020
+
+[Unit]
+Description=ISP i.MX 8Mplus daemon
+
+StartLimitIntervalSec=500
+StartLimitBurst=5
+
+[Service]
+Restart=on-failure
+RestartSec=5s
+# ENXIO            
+RestartPreventExitStatus=6
+ExecStart=/opt/imx8-isp/bin/start_isp.sh
+
+[Install]
+WantedBy=multi-user.target

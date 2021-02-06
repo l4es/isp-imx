@@ -1,0 +1,50 @@
+[Project ID]
+Signature=UE Proj: v.1
+[Project Information]
+Compilable=1
+Use Relative Directory=1
+Relative to Project File=1
+Project Directory=
+Include Sub Directories=1
+Project Tagfile=
+Project Wordfile=
+Filter=
+Using VCS=0
+Save Account=0
+Create Tagfile=0
+CTags Legacy Support=0
+[uemakeXp]
+ReleaseMode=0
+[Debug Settings]
+Program Arguments=
+Symbol Paths=
+Working Directory=
+Selected Debugger=0
+Source Paths=
+[Group]
+0=build
+1=include
+2=source
+3=test
+4=example_app
+[Files - build]
+0=CMakeLists.txt
+1=unit_test\CMakeLists.txt
+2=example_app\CMakeLists.txt
+[Files - include]
+0=include\oslayer.h
+1=include\oslayer_linux.h
+[Files - source]
+0=source\oslayer_generic.c
+1=source\oslayer_linux.c
+[Files - test]
+0=unit_test\runner\unitTestRunner.c
+1=unit_test\tests\oslayer_Eventstest.c
+2=unit_test\tests\oslayer_Misctest.c
+3=unit_test\tests\oslayer_Mutexetest.c
+4=unit_test\tests\oslayer_Queuetest.c
+5=unit_test\tests\oslayer_Semaphoretest.c
+6=unit_test\tests\oslayer_Test.h
+7=unit_test\tests\oslayer_Threadtest.c
+[Files - example_app]
+0=example_app\oslayer_example_app.c

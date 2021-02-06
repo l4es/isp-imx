@@ -1,0 +1,11 @@
+{
+
+"config": {
+	"case_loop": 2,
+	"case_interval": 1 //second
+},
+"case_lists": [
+	"vvb_002_sensor01_ov2775_1080p_mp_preview_dom.json"
+]
+
+}

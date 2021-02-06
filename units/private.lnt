@@ -1,0 +1,42 @@
+// This file defines lint configurations that are private to this project/unit.
+
+// All messages that are disabled must be commented
+// WHO disabled it, WHEN was this introduced and WHY was it disabled.
+
+//	Disabled 7.2.2007 by fro.
+//	This is not a relevant warning. Committee Draft January 18, 1999 od ANSI C
+//	standard says in 6.7.2.2
+//	"The identifiers in an enumerator list are declared as constants that have type int and
+//	may appear wherever such are permitted."
+-e641
+
+// do not stumble about #error
+-ppw(error)
++ppw(error)
++fll // enable the long long type //5/18/2010
+
+//added by JingL
++fbo //enable bool type
+
++macros
++linebuf
+//some declarations
+-dinline=__inline__
+-d__BASE_FILE__=""
+
+//we use C90
+-d__STDC_VERSION__=1
+
+-d_FILE_OFFSET_BITS=64
+
+//on Linux we have stdint.h
+-dHAS_STDINT_H
+
+//lint is not able to typedef int64_t or uint64_t
+-d"int64_t=long long int"
+-d"uint64_t=unsigned long long int"
+//we also have to disable warnings 104 and 19 (see units/include/sii_types.h):
+///usr/include/stdint.h:44: warning: 104: Conflicting types
+///usr/include/stdint.h:44: warning: 19: Useless Declaration
+
+

@@ -1,0 +1,44 @@
+#/******************************************************************************\
+#|* Copyright (c) <2020> by VeriSilicon Holdings Co., Ltd. ("VeriSilicon")     *|
+#|* All Rights Reserved.                                                       *|
+#|* Copyright (c) <2010> by Silicon Image, Inc., used with permission by       *|
+#|* VeriSilicon.                                                               *|
+#|*                                                                            *|
+#|* The material in this file is confidential and contains trade secrets of    *|
+#|* of VeriSilicon.  This is proprietary information owned or licensed by      *|
+#|* VeriSilicon.  No part of this work may be disclosed, reproduced, copied,   *|
+#|* transmitted, or used in any way for any purpose, without the express       *|
+#|* written permission of VeriSilicon.                                         *|
+#|*                                                                            *|
+#\******************************************************************************/
+
+
+if [  -z "$LD_LIBRARY_PATH" ]; then
+    echo "  Please double check the LD_LIBRARY_PATH in sys env."
+    echo "  export $LD_LIBRARY_PATH=<Path to Libraries>"
+    #return 1
+fi
+
+if [ ! -z "$Qt_DIR5_X86" ]; then
+    echo "Please unset Qt_DIR5_X86 home in your environment!"
+    echo "Make correct path to: export Qt_DIR5_X86=<PATH to QT512 home Directory>"
+    return 1
+fi
+
+if [ ! -z "$QWT_DIR_X86" ]; then
+    echo "Please unset QWT_DIR_X86 home in your environment!"
+    echo "Make correct path to: export QWT_DIR_X86=<PATH to QWT614 home Directory>"
+    return 1
+fi
+
+export COMPILE_PLATFORM=X86
+#export PATH=
+export Qt_DIR5_X86=/opt/vsi_isp_tools/Qt5126_X86_64
+export QWT_DIR_X86=/opt/vsi_isp_tools/qwt614_x86_64
+export QT_QPA_PLATFORM_PLUGIN_PATH=/opt/vsi_isp_tools/Qt5126_X86_64/plugins
+
+# Append environment subscripts
+
+
+
+echo "X86 environment setup successfully!"

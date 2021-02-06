@@ -1,0 +1,46 @@
+#/******************************************************************************\
+#|* Copyright (c) <2020> by VeriSilicon Holdings Co., Ltd. ("VeriSilicon")     *|
+#|* All Rights Reserved.                                                       *|
+#|* Copyright (c) <2010> by Silicon Image, Inc., used with permission by       *|
+#|* VeriSilicon.                                                               *|
+#|*                                                                            *|
+#|* The material in this file is confidential and contains trade secrets of    *|
+#|* of VeriSilicon.  This is proprietary information owned or licensed by      *|
+#|* VeriSilicon.  No part of this work may be disclosed, reproduced, copied,   *|
+#|* transmitted, or used in any way for any purpose, without the express       *|
+#|* written permission of VeriSilicon.                                         *|
+#|*                                                                            *|
+#\******************************************************************************/
+
+
+if [  -z "$LD_LIBRARY_PATH" ]; then
+    echo "  Please double check the LD_LIBRARY_PATH in sys env."
+    echo "  export $LD_LIBRARY_PATH=<Path to Libraries>"
+    #return 1
+fi
+
+if [ ! -z "$Qt_DIR5_ARM64" ]; then
+    echo "Please unset Qt_DIR5_ARM64 home in your environment!"
+    echo "Make correct path to: export Qt_DIR5_ARM64=<PATH to QT512 home Directory>"
+    return 1
+fi
+
+if [ ! -z "$QWT_DIR_ARM64" ]; then
+    echo "Please unset QWT_DIR_ARM64 home in your environment!"
+    echo "Make correct path to: export QWT_DIR_ARM64=<PATH to QWT614 home Directory>"
+    return 1
+fi
+
+export COMPILE_PLATFORM=ARM64
+#export PATH=
+export Qt_DIR5_ARM64=/opt/vsi_isp_tools/Qt5129_arm64
+export QWT_DIR_ARM64=/opt/vsi_isp_tools/qwt614_arm64
+
+source /opt/fsl-imx-xwayland/5.4-zeus/environment-setup-aarch64-poky-linux
+export ARM_SYSROOT_PATH=/opt/fsl-imx-xwayland/5.4-zeus/sysroots/aarch64-poky-linux
+
+# Append environment subscripts
+
+
+
+echo "ARM64 environment setup successfully!"

@@ -1,0 +1,13 @@
+{
+
+"device": {
+	"cam_dev_id": 1
+},
+
+"memory_pool" :{
+	"phy_address_base": 2952790016,//0xb0000000,
+	"align_mask": 4096,  //4k align
+	"total_pool_size": 268435456 //256 MB
+}
+
+}

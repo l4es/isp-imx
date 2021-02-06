@@ -1,0 +1,63 @@
+{
+	"isp_number": 2,
+	"isp_cfg": [
+		{
+			"isp_id": 0,
+			"isp_enalbe": 0,
+			"buffer_type": "phylinear" //Supported: phylinear, userptr
+		},
+		{
+			"isp_id": 1,
+			"isp_enalbe": 1,
+			"buffer_type": "userptr", //Supported: phylinear, userptr
+			"path_cfg":[
+				{
+					"path_name": "MP",
+					"path_enable": 1, 
+					"buffer_number": 6,
+					"buffer_alloc_size": 16777216, //0x1000000, 4K size*2， upto 16M
+					"width": 1920,
+					"height": 1080,
+					"format": "YUV422SP"
+				},
+				{
+					"path_name": "SP1",
+					"path_enable": 0, 
+					"buffer_number": 6,
+					"buffer_alloc_size": 16777216, //0x1000000, 4K size*2， upto 16M
+					"width": 1920,
+					"height": 1080,
+					"format": "YUV422SP"
+				},
+				{
+					"path_name": "SP2",
+					"path_enable": 0, 
+					"buffer_number": 6,
+					"buffer_alloc_size": 16777216, //0x1000000, 4K size*2， upto 16M
+					"width": 1920,
+					"height": 1080,
+					"format": "YUV422SP"
+				}
+			],
+
+			"input_type": "Sensor",      //Invalid, Sensor, Image, Tpg, Max
+			"sensor_info":
+			{
+				"sensor_name": "OV2775.drv",
+				"calibration_name": "OV2775.xml",
+				"sensor_dev_id": 1,
+				"resolution_width": 1920,
+				"resolution_height": 1080
+			},
+
+			"function_control":
+			{
+				"aec_enable": 1,
+				"awb_enable": 1,
+				"wdr3_enalbe": 0
+			},
+
+			"stream_duration": 30000 //Second
+		}
+	]
+}

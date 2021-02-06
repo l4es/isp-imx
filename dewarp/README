@@ -1,0 +1,24 @@
+depends: mediacontrol and dewarp
+
+if meet json parse error, please run:
+dos2unix test/case/list.txt
+--------------------------
+mkdir build
+cd build
+cmake .. -DCMODEL=ON -DV4L2=OFF -Wno-dev 
+or
+cmake .. -DCMODEL=OFF -DV4L2=OFF -Wno-dev
+or
+cmake .. -DCMODEL=OFF -DV4L2=ON -Wno-dev
+make
+
+generate full case:
+cd build/test
+./case_generator
+
+TEST:
+cd build/test
+./dewarp_test      # run simple test
+               -f  # run Full test.
+               -u  # auto Update hash value. all case will pass.
+               -c  #  clear result image files.

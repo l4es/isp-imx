@@ -1,0 +1,27 @@
+V3.1.x units compile guide
+
+
+cmake -DCMAKE_BUILD_TYPE=debug -DISP_VERSION=ISP8000NANO_V1802 -DPLATFORM=X86 -DAPPMODE=NATIVE -DQTLESS=0 -DSUBDEV_CHAR=1 -DFULL_SRC_COMPILE=1 -DSERVER_LESS=0 ..
+
+Options:
+* CMAKE_BUILD_TYPE: release or debug
+* ISP_VERSION: aligned with ISP project configurations.
+	ISP Version Details refer to release note.
+* PLATFORM:
+	ARM64
+	ARMV7
+	X86
+* APPMODE:
+	V4L2
+	NATIVE
+	MEDIACONTROL  (future support)
+* QTLESS:
+	0: with QT environment
+	1: without QT environment
+* FULL_SRC_COMPILE:
+	1: full source compile with driver, media controller
+	0: lib compile with driver and media controller
+* SERVER_LESS:
+	0: with tuning server compile
+	1: without tuning server compile
+

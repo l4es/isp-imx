@@ -1,0 +1,58 @@
+/******************************************************************************\
+|* Copyright (c) 2020 by VeriSilicon Holdings Co., Ltd. ("VeriSilicon")       *|
+|* All Rights Reserved.                                                       *|
+|*                                                                            *|
+|* The material in this file is confidential and contains trade secrets of    *|
+|* of VeriSilicon.  This is proprietary information owned or licensed by      *|
+|* VeriSilicon.  No part of this work may be disclosed, reproduced, copied,   *|
+|* transmitted, or used in any way for any purpose, without the express       *|
+|* written permission of VeriSilicon.                                         *|
+|*                                                                            *|
+\******************************************************************************/
+
+#ifndef ISPCORE_INTERFACE_CAMERAINTERFACE_H_
+#define ISPCORE_INTERFACE_CAMERAINTERFACE_H_
+#include <string>
+#include <vector>
+#include <functional>
+
+#include "camera_metadata.h"
+
+class CameraInterface {
+public:
+	virtual ~CameraInterface() {}
+	virtual bool open() = 0;
+    virtual bool close() = 0;
+    virtual bool start() = 0;
+    virtual bool stop() = 0;
+    virtual bool load(const char* szFileName) = 0;
+    virtual void setFormat(int nPort, int width, int height, int format) = 0;
+    virtual void registerBufferCallback(std::function<void(void*)> callback = nullptr) = 0;
+    virtual void queueBuffer(int nPort, int width, int height, int format, int size, uint64_t addr) = 0;
+
+    // aec, tpg, awb, af, hdr cac 3dnr 2dnr cnr gamma bypass. --- OFF, MANUAL, AUTO...etc
+    virtual bool setMode(int type, void* param) = 0;
+    static CameraInterface* createObject(int id);
+
+#if 0
+    virtual bool setFramerate(int fps) = 0;
+	virtual int getFramerate() = 0;
+
+
+    virtual bool setMode(int type, int mode, void* param) = 0;
+	virtual int getMode(int type, void* param) = 0;
+
+	virtual bool getMetadata(int type, camera_metadata* data) = 0;
+#endif
+};
+
+#ifdef __cplusplus
+extern "C" {
+#if 0   //  will be implemented.
+	CameraInterface* vsiOpenCamera(int cameraId);
+	bool vsiCloseCamera(int cameraId);
+#endif
+}
+#endif
+
+#endif  // ISPCORE_INTERFACE_CAMERAINTERFACE_H_

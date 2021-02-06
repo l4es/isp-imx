@@ -1,0 +1,59 @@
+Tuning server build:
+Dependencies:
+1:  boost
+		version:1.71.0
+		link:   https://dl.bintray.com/boostorg/release/1.71.0/source/boost_1_71_0.zip
+	prebuild steps:
+	setup environment, like:
+	cd appshell/ 
+	source environment-setup-x86_64-linux
+
+	cd utils3rd/3rd/boost
+	./b2 --clean-all
+	cd boost_1_71_0
+	./bootstrap.sh --with-libraries=date_time,filesystem,regex,system,thread
+	./b2 <build_type> --build-dir=build/<platform>/debug --stagedir=build/<platform>/<build_type>
+
+	platform can be one of following:
+		X86
+		ARM64
+		ARMV7
+		CSKY
+	build_type can be one of the following:
+		build
+		release
+	Example:
+	./b2 debug --build-dir=build/X86/debug --stagedir=build/X86/debug
+	./b2 release --build-dir=build/X86/release --stagedir=build/X86/release
+
+
+2: cpp-netlib:
+		version: 0.13-release
+		link:
+			git clone https://github.com/cpp-netlib/cpp-netlib.git cpp-netlib-master
+			cd cpp-netlib-master
+			git checkout 0.13-release
+
+
+	prebuild steps:
+	setup environment, like:
+	cd appshell/ 
+	source environment-setup-x86_64-linux
+
+	cd utils3rd/3rd/cpp-netlib/prebuilt/<platform>
+	cmake -DCMAKE_BUILD_TYPE=<build_type> ../../ -Wno-dev -DBOOST_ROOT=$(pwd)/../../../boost/ -DBOOST_LIBRARYDIR=$(pwd)/../../../boost/build/X86/debug/lib -DCPP-NETLIB_BUILD_TESTS=OFF -DCPP-NETLIB_BUILD_EXAMPLES=OFF -DCPP-NETLIB_ENABLE_HTTPS=OFF
+	make -j
+
+	platform can be one of following:
+		X86
+		ARM64
+		ARMV7
+		CSKY
+	build_type can be one of the following:
+		build
+		release
+	Example:
+	cd utils3rd/3rd/cpp-netlib/build/X86
+	cmake -DCMAKE_BUILD_TYPE=debug ../../ -Wno-dev -DBOOST_ROOT=$(pwd)/../../../boost/ -DBOOST_LIBRARYDIR=$(pwd)/../../../boost/build/X86/debug/lib -DCPP-NETLIB_BUILD_TESTS=OFF -DCPP-NETLIB_BUILD_EXAMPLES=OFF -DCPP-NETLIB_ENABLE_HTTPS=OFF
+	cmake -DCMAKE_BUILD_TYPE=release ../../ -Wno-dev -DBOOST_ROOT=$(pwd)/../../../boost/ -DBOOST_LIBRARYDIR=$(pwd)/../../../boost/build/X86/debug/lib -DCPP-NETLIB_BUILD_TESTS=OFF -DCPP-NETLIB_BUILD_EXAMPLES=OFF -DCPP-NETLIB_ENABLE_HTTPS=OFF
+

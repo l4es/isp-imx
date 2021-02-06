@@ -1,0 +1,13 @@
+{
+    "globalSetting": {
+        "som": {
+            "enable": 1
+        },
+
+		"test": {
+			"generateGolden" 	: 1,
+			"verifyGolden"	    : 0,
+			"goldenPath"		: "../../../../../test/golden/engine"
+		}
+    }
+}

@@ -1,0 +1,56 @@
+{
+	"?dewarpMode" : "LENS_CORRECTION, FISHEYE_EXPAND, SPLIT_SCREEN",
+	"?format" : "YUV422SP, YUV422I, YUV420SP",
+	"ID" : "2095",
+	"camera_matrix" : 
+	[
+		655.1607440459469,
+		0.0,
+		160,
+		0.0,
+		655.52406676868952,
+		120,
+		0.0,
+		0.0,
+		1
+	],
+	"dewarpMode" : "LENS_CORRECTION",
+	"distortion_coeff" : 
+	[
+		-0.022095698671518085,
+		0.0038543889520066955,
+		-0.0059060355970132873,
+		0.0019007362178503509,
+		0.0,
+		0.0,
+		0.0,
+		0.0
+	],
+	"goldenHashKey" : "5896459770458768145",
+	"input" : 
+	{
+		"file" : "case/resource_full/DWRES_YUV420SP_320x240.yuv",
+		"format" : "YUV420SP",
+		"height" : 240,
+		"width" : 320
+	},
+	"output" : 
+	{
+		"format" : "YUV420SP",
+		"height" : 480,
+		"width" : 640
+	},
+	"perspective" : [ 1.0, 0, 0, 0, 1, 0, 0, 0, 1 ],
+	"scale" : 
+	{
+		"factor" : 2.0,
+		"roix" : 0.0,
+		"roiy" : 0.0
+	},
+	"split" : 
+	{
+		"horizon_line" : 120,
+		"vertical_line_down" : 160,
+		"vertical_line_up" : 160
+	}
+}

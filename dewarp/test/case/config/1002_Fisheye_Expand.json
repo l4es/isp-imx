@@ -1,0 +1,51 @@
+{
+	"?dewarpMode" : "LENS_CORRECTION, FISHEYE_EXPAND, SPLIT_SCREEN",
+	"?format" : "YUV422SP, YUV422I, YUV420SP",
+	"ID" : "1002",
+	"camera_matrix" : 
+	[
+		655.1607440459469,
+		0.0,
+		964.20599053623062,
+		0.0,
+		655.52406676868952,
+		532.03601317192908,
+		0.0,
+		0.0,
+		1.0
+	],
+	"date" : "2019/04/06 16:00:00",
+	"desc" : "Test VSI fisheye expand",
+	"dewarpMode" : "FISHEYE_EXPAND",
+	"distortion_coeff" : 
+	[
+		-0.022095698671518085,
+		0.0038543889520066955,
+		-0.0059060355970132873,
+		0.0019007362178503509,
+		0.0,
+		0.0,
+		0.0,
+		0.0
+	],
+	"goldenHashKey" : "10300948953697335739",
+	"input" : 
+	{
+		"file" : "case/resource/fisheye_420SP_1440x1440.yuv",
+		"format" : "YUV420SP",
+		"height" : 1440,
+		"width" : 1440
+	},
+	"output" : 
+	{
+		"format" : "YUV420SP"
+	},
+	"perspective" : [ 1.0, 0, 0, 0, 1, 0, 0, 0, 1 ],
+	"scale" : 
+	{
+		"factor" : 1.0,
+		"roix" : 0,
+		"roiy" : 0
+	},
+	"ver" : "1.0.0"
+}

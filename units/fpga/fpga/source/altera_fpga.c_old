@@ -1,0 +1,741 @@
+/*******************************************************************************/
+/*! This is an unpublished work, the copyright in which vests in sci-worx GmbH.
+*   The information contained herein is the property of sci-worx GmbH and is
+*   supplied without liability for errors or omissions. No part may be repro-
+*   duced or used except as authorized by contract or other written permission.
+*   Copyright(c) sci-worx GmbH, 2007. All rights reserved.
+*/
+/******************************************************************************/
+/*! Module    : Altera driver
+*
+* Hierarchy :
+*
+* Purpose   : User-level driver for the Altera FPGA board
+*
+* Creator   : Martin Fiedler
+*/
+/******************************************************************************/
+/**
+ *  @file altera_fpga.c
+ *  @brief User-level driver for the Altera FPGA board
+ */
+
+#ifdef WIN32
+    #error the Altera FPGA board driver is only available for Unix-like operating systems
+#endif
+
+#define _XOPEN_SOURCE 500  /* required for usleep() */
+#define _GNU_SOURCE        // required for CPU affinity stuff in <sched.h>
+
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <sys/ioctl.h>
+#include <sys/mman.h>
+#include <errno.h>
+#include <fcntl.h>
+#include <sched.h>
+
+/* #include "scmi_base.h" */
+#include "oslayer/oslayer.h"
+#include "altera_fpga.h"
+#ifdef EMULATOR
+#include "isp_core/register_driver.h"
+#endif
+
+#include <ebase/trace.h>
+CREATE_TRACER(FPGA_INFO , "FPGA: ", INFO,  1);
+CREATE_TRACER(FPGA_DEBUG, "FPGA: ", INFO,  1);
+CREATE_TRACER(FPGA_ERROR, "FPGA: ", ERROR, 1);
+
+typedef struct isp_ioctl_reg_struct
+{
+    unsigned int offset;
+    unsigned int val;
+}struct_isp_ioctl_reg;
+
+/* define some data types required by the DMA driver header */
+typedef uint32_t      ULONG32;
+typedef uint32_t      DWORD;
+typedef uint64_t      ULONG64;
+typedef uint64_t      ULONGLONG;
+typedef void *        PVOID;
+typedef unsigned char UCHAR;
+typedef unsigned char BYTE;
+typedef unsigned int  USHORT;
+typedef unsigned int  UINT;
+typedef unsigned long ULONG;
+#define SIZE_T(arg)   ((size_t)(arg))
+
+#include "fpga_drv/DmaDriverIoctl.h"
+
+#define FPGA_DMA_EXPANSION        (FPGA_DATA_BLOCK_STRIDE / FPGA_DATA_BLOCK_SIZE)
+#define FPGA_DMA_BUFFER_SIZE      (FPGA_DMA_BLOCK_SIZE * FPGA_DMA_EXPANSION)
+#define FPGA_DATA_ITEM_SIZE_MASK  (FPGA_DATA_ITEM_SIZE - 1)
+#define FPGA_DATA_BLOCK_SIZE_MASK (FPGA_DATA_BLOCK_SIZE - 1)
+#define FPGA_DATA_ITEM_ADDR_MASK  (FPGA_DATA_BLOCK_SIZE_MASK & (~FPGA_DATA_ITEM_SIZE_MASK))
+
+#define FPGA_MANGLE_DMA_ADDRESS(i) ( \
+            /* block address */  ((i) & ~FPGA_DATA_BLOCK_SIZE_MASK) * FPGA_DMA_EXPANSION + \
+            /* item  address */  ((i) & FPGA_DATA_ITEM_ADDR_MASK) + \
+            /* byte  address */  FPGA_DATA_ITEM_SIZE_MASK - ((i) & FPGA_DATA_ITEM_SIZE_MASK) )
+
+#define FPGA_ALIGN_BLOCK_SIZE(x) \
+            (((x) + FPGA_DMA_SIZE_ALIGNMENT - 1) & (~(FPGA_DMA_SIZE_ALIGNMENT - 1)))
+
+
+#define EXT_MEM_ALIGN    0x1000 // 4k
+
+#define FPGA_PLL_CONFIG_BAR            2
+#define FPGA_PLL_CONFIG_PARAM_ADDR     FPGA_REG_ADDRESS_MOD(0 * 4)
+#define FPGA_PLL_CONFIG_WR_DATA_ADDR   FPGA_REG_ADDRESS_MOD(1 * 4)
+#define FPGA_PLL_CONFIG_WR_PARAM_ADDR  FPGA_REG_ADDRESS_MOD(2 * 4)
+#define FPGA_PLL_CONFIG_RECONFIG_ADDR  FPGA_REG_ADDRESS_MOD(3 * 4)
+#define FPGA_PLL_CONFIG_RESET_ADDR     FPGA_REG_ADDRESS_MOD(2 * 4)
+
+static uint32_t _set_single_pll_param(const uint32_t config_reg_offset, const uint8_t counter_type, const uint8_t counter_param, const uint16_t value);
+static uint32_t _set_single_pll_counter(const uint32_t config_reg_offset, const uint8_t counter_type, const uint16_t value);
+
+const AlteraFPGAPLL_t AlteraFPGAPLL_1 = { FPGA_REG_ADDRESS_MOD(3 * 4), (1 << 8), (1 << 9) };
+const AlteraFPGAPLL_t AlteraFPGAPLL_2 = { FPGA_REG_ADDRESS_MOD(9 * 4), (1 << 6), (1 << 7) };
+
+static int device_file = 0;
+static int dma_write_engine = -1;
+static int dma_read_engine = -1;
+#if FPGA_USE_KERNEL_IRQ_HANDLING
+    fpga_irq_handle_t *irq_registered = NULL;
+#else
+    static osMutex poll_mutex;
+    static volatile int irq_cancel_all;
+#endif
+#if FPGA_USE_MMAP
+    volatile uint32_t* fpga_regs_mmap;
+#endif
+volatile uint32_t fpga_disable_irq_poll = 0;
+static uint8_t dma_buf_mem[FPGA_DMA_BUFFER_SIZE + FPGA_DMA_ALIGNMENT];
+static uint8_t *dma_buf = dma_buf_mem;
+static osMutex dma_mutex;
+static osMutex raw_dma_mutex;
+uint8_t *extern_mem_virtual_base;
+unsigned long reservedMemBase = ~0UL;
+unsigned long reservedMemSize = 0;
+
+/*******************************************************************************/
+
+uint32_t AlteraFPGABoard_Open(void) {
+    int i;
+
+    if (device_file) {
+        return FPGA_RES_INVAL;
+    }
+
+    // bind process to single CPU
+    // NOTE: assumes no threads have been created so far...
+    cpu_set_t cpuMask;
+    CPU_ZERO(&cpuMask);
+    CPU_SET(0, &cpuMask);
+    if (sched_setaffinity(0, sizeof(cpu_set_t), &cpuMask) != 0)
+    {
+        TRACE(FPGA_ERROR, "%s: Couldn't set affinity!\n", __func__);
+    }
+
+#if FPGA_USE_KERNEL_IRQ_HANDLING
+    irq_registered = NULL;
+#else
+    irq_cancel_all = 0;
+    if (osMutexInit(&poll_mutex) != OSLAYER_OK) {
+        return FPGA_RES_FAIL;
+    }
+#endif
+
+#ifdef ISP8000L_V1901
+    device_file = open("/dev/FpgaDriver", O_RDWR);
+#else
+    device_file = open(PROCFS_FB_PATH, O_RDWR);
+#endif
+
+    if (device_file < 0) {
+        device_file = 0;
+        return FPGA_RES_NODEV;
+    }
+
+    /* map registers */
+#if FPGA_USE_MMAP
+    fpga_regs_mmap = (uint32_t*) mmap(NULL, FPGA_REGISTER_SPACE_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED, device_file, 0);
+    if (!fpga_regs_mmap || (fpga_regs_mmap == MAP_FAILED)) {
+        fpga_regs_mmap = NULL;
+        close(device_file);
+        device_file = 0;
+        return FPGA_RES_FAIL;
+    }
+#endif
+
+    /* set up DMA buffer */
+    dma_buf = &dma_buf_mem[FPGA_DMA_ALIGNMENT - (((uintptr_t) dma_buf_mem) & (FPGA_DMA_ALIGNMENT - 1))];
+
+    /* find DMA engines */
+    dma_write_engine = dma_read_engine = -1;
+#if 0
+    for (i = 0;  i < MAX_NUM_DMA_ENGINES;  ++i) {
+        DMA_CAP_STRUCT cap;
+        cap.EngineNum = i;
+        if (ioctl(device_file, GET_DMA_ENGINE_CAP_IOCTL_BASE, &cap) == -1) {
+            close(device_file);
+            device_file = 0;
+            return FPGA_RES_FAIL;
+        }
+        if (((cap.DmaCapabilities & DMA_CAP_ENGINE_PRESENT) == 0)
+        ||  ((cap.DmaCapabilities & DMA_CAP_ENGINE_TYPE_MASK) != DMA_CAP_BLOCK_DMA)) {
+            continue;  /* this DMA engine isn't interesting to us */
+        }
+        if (((cap.DmaCapabilities & DMA_CAP_DIRECTION_MASK) == DMA_CAP_SYSTEM_TO_CARD)
+        && (dma_write_engine < 0)) {
+            dma_write_engine = i;
+        }
+        if (((cap.DmaCapabilities & DMA_CAP_DIRECTION_MASK) == DMA_CAP_CARD_TO_SYSTEM)
+        && (dma_read_engine < 0)) {
+            dma_read_engine = i;
+        }
+    }
+    if ((dma_read_engine < 0) || (dma_write_engine < 0)) {
+        return FPGA_RES_NODMA;
+    }
+#else
+    dma_write_engine = dma_read_engine = 1;
+#endif
+
+    /* allocate mutexes */
+    if ((osMutexInit(&dma_mutex) != OSLAYER_OK) || (osMutexInit(&raw_dma_mutex) != OSLAYER_OK)) {
+        return FPGA_RES_NODMA;
+    }
+
+    if ((ioctl(device_file, GET_RESERVED_MEM_BASE_IOCTL_BASE, &reservedMemBase) < 0) ||
+        (ioctl(device_file, GET_RESERVED_MEM_SIZE_IOCTL_BASE, &reservedMemSize) < 0))
+    {
+        return FPGA_RES_FAIL;
+    }
+    printf("reservedMemBase: 0x%08lX, reservedMemSize: 0x%08lX\n", reservedMemBase, reservedMemSize);
+
+    extern_mem_virtual_base = (uint8_t*) mmap(NULL, reservedMemSize, PROT_READ | PROT_WRITE, MAP_SHARED, device_file, 0);
+    if (!extern_mem_virtual_base || (extern_mem_virtual_base == MAP_FAILED)) {
+        extern_mem_virtual_base = NULL;
+        close(device_file);
+        device_file = 0;
+        return FPGA_RES_FAIL;
+    }
+
+    return FPGA_RES_OK;
+}
+
+/*******************************************************************************/
+
+uint32_t AlteraFPGABoard_Close(void) {
+    if (!device_file) {
+        return FPGA_RES_NODEV;
+    }
+#if FPGA_USE_KERNEL_IRQ_HANDLING
+    if (irq_registered) {
+        AlteraFPGABoard_StopIRQ();
+    }
+#else
+    irq_cancel_all = 1;
+    usleep(2 * FPGA_IRQ_POLL_INTERVAL);
+    osMutexDestroy(&poll_mutex);
+#endif
+#if FPGA_USE_MMAP
+    if (fpga_regs_mmap) {
+        munmap((void*) fpga_regs_mmap, FPGA_REGISTER_SPACE_SIZE);
+    }
+#endif
+
+    if (extern_mem_virtual_base) {
+        munmap((void*) extern_mem_virtual_base, reservedMemSize);
+    }
+
+    osMutexDestroy(&dma_mutex);
+    osMutexDestroy(&raw_dma_mutex);
+    close(device_file);
+    device_file = 0;
+    return FPGA_RES_OK;
+}
+
+/*******************************************************************************/
+
+uint32_t AlteraFPGABoard_ReadBAR(uint32_t bar, uint32_t address) {
+#if 0
+	DO_MEM_STRUCT dms;
+    uint32_t data;
+    if (!device_file) {
+        return FPGA_READ_ERROR;
+    }
+    dms.Rd_Wr_n = READ_FROM_CARD;
+    dms.BarNum = bar;
+    dms.Offset = 0;
+    dms.CardOffset = address;
+    dms.Length = 4;
+    dms.Buffer = (unsigned char*) &data;
+    if (ioctl(device_file, DO_MEM_READ_ACCESS_IOCTL_BASE, &dms) == -1) {
+        return FPGA_READ_ERROR;
+    }
+    return data;
+#else
+
+    uint32_t data;
+
+#ifdef EMULATOR
+    driverReadRegister(address, &data);
+#else
+
+	struct_isp_ioctl_reg isp_ioctl_reg;
+	isp_ioctl_reg.offset = address;
+
+    if(bar > 4) return -1;
+
+    if (!device_file) {
+        return FPGA_READ_ERROR;
+    }
+
+	if (ioctl(device_file, REGISTER_READ_IOCTL_BASE, &isp_ioctl_reg) == -1) {
+        return FPGA_READ_ERROR;
+    }
+
+	data = isp_ioctl_reg.val;
+#endif
+
+    return data;
+#endif
+}
+
+/*******************************************************************************/
+
+uint32_t AlteraFPGABoard_WriteBAR(uint32_t bar, uint32_t address, uint32_t data) {
+#if 0
+    DO_MEM_STRUCT dms;
+    if (!device_file) {
+        return FPGA_RES_NODEV;
+    }
+    dms.Rd_Wr_n = WRITE_TO_CARD;
+    dms.BarNum = bar;
+    dms.Offset = 0;
+    dms.CardOffset = address;
+    dms.Length = 4;
+    dms.Buffer = (unsigned char*) &data;
+    if (ioctl(device_file, DO_MEM_WRITE_ACCESS_IOCTL_BASE, &dms) == -1) {
+        return FPGA_RES_FAIL;
+    }
+    return FPGA_RES_OK;
+#else
+
+#ifdef EMULATOR
+    driverWriteRegisterToCmodel(address, data);
+#else
+    struct_isp_ioctl_reg isp_ioctl_reg;
+
+	if(bar != 1) return FPGA_RES_OK;
+
+	isp_ioctl_reg.offset = address;
+	isp_ioctl_reg.val= data;
+
+	if (!device_file) {
+        return FPGA_READ_ERROR;
+    }
+
+	if (ioctl(device_file, REGISTER_WRITE_IOCTL_BASE, &isp_ioctl_reg) == -1) {
+        return FPGA_RES_FAIL;
+    }
+#endif
+
+	return FPGA_RES_OK;
+#endif
+}
+
+/*******************************************************************************/
+
+uint32_t AlteraFPGABoard_RawDMAWrite(void* data, uint32_t address, uint32_t size) {
+#if 0
+    DO_DMA_STRUCT dma;
+#endif
+    int res;
+
+    TRACE(FPGA_INFO, "%s (data=%p, address=0x%08x, size=%d)\n", __func__, data, address, size);
+
+    if (!device_file) {
+        return FPGA_RES_NODEV;
+    }
+    if (dma_write_engine < 0) {
+        return FPGA_RES_NODMA;
+    }
+#if 0
+    dma.EngineNum = (ULONG32) dma_write_engine;
+    dma.CardOffset = address;
+    dma.Length = size;
+    dma.BufferAddress = data;
+
+    TRACE(FPGA_DEBUG, "%s: osMutexLock(&raw_dma_mutex)\n", __func__);
+    osMutexLock(&raw_dma_mutex);
+
+    TRACE(FPGA_DEBUG, "%s: AlteraFPGABoard_ForbidIRQPolling()\n", __func__);
+    AlteraFPGABoard_ForbidIRQPolling();
+
+    TRACE(FPGA_DEBUG, "%s: ioctl(device_file, BLOCK_DIRECT_DO_DMA_WRITE_IOCTL_BASE, &dma)\n", __func__);
+    res = ioctl(device_file, BLOCK_DIRECT_DO_DMA_WRITE_IOCTL_BASE, &dma);
+    TRACE(FPGA_DEBUG, "%s: ioctl(device_file, BLOCK_DIRECT_DO_DMA_WRITE_IOCTL_BASE, &dma) result = %d\n", __func__, res);
+
+    TRACE(FPGA_DEBUG, "%s: AlteraFPGABoard_AllowIRQPolling()\n", __func__);
+    AlteraFPGABoard_AllowIRQPolling();
+
+    TRACE(FPGA_DEBUG, "%s: osMutexUnlock(&raw_dma_mutex)\n", __func__);
+    osMutexUnlock(&raw_dma_mutex);
+
+    TRACE(FPGA_INFO, "%s (done)\n", __func__);
+    return (res == -1) ? FPGA_RES_FAIL : FPGA_RES_OK;
+#else
+	memcpy(extern_mem_virtual_base+(address-reservedMemBase),data,size);
+#endif
+
+	return FPGA_RES_OK;
+}
+
+/*******************************************************************************/
+
+uint32_t AlteraFPGABoard_RawDMARead(void* data, uint32_t address, uint32_t size) {
+#if 0
+    DO_DMA_STRUCT dma;
+#endif
+    int res;
+
+    TRACE(FPGA_INFO, "%s (data=%p, address=0x%08x, size=%d)\n", __func__, data, address, size);
+
+    if (!device_file) {
+        TRACE(FPGA_INFO, "%s no device_file, 0x%x\n", __func__, (unsigned long)device_file);
+        return FPGA_RES_NODEV;
+    }
+    if (dma_read_engine < 0) {
+        TRACE(FPGA_INFO, "%s no dma_read_engine, 0x%x\n", __func__, (unsigned long)dma_read_engine);
+        return FPGA_RES_NODMA;
+    }
+#if 0
+    dma.EngineNum = (ULONG32) dma_read_engine;
+    dma.CardOffset = address;
+    dma.Length = size;
+    dma.BufferAddress = data;
+
+    TRACE(FPGA_DEBUG, "%s: osMutexLock(&raw_dma_mutex)\n", __func__);
+    osMutexLock(&raw_dma_mutex);
+
+    TRACE(FPGA_DEBUG, "%s: AlteraFPGABoard_ForbidIRQPolling()\n", __func__);
+    AlteraFPGABoard_ForbidIRQPolling();
+
+    TRACE(FPGA_DEBUG, "%s: ioctl(device_file, BLOCK_DIRECT_DO_DMA_READ_IOCTL_BASE, &dma)\n", __func__);
+    res = ioctl(device_file, BLOCK_DIRECT_DO_DMA_READ_IOCTL_BASE, &dma);
+    TRACE(FPGA_DEBUG, "%s: ioctl(device_file, BLOCK_DIRECT_DO_DMA_READ_IOCTL_BASE, &dma) result = %d\n", __func__, res);
+
+    TRACE(FPGA_DEBUG, "%s: AlteraFPGABoard_AllowIRQPolling()\n", __func__);
+    AlteraFPGABoard_AllowIRQPolling();
+
+    TRACE(FPGA_DEBUG, "%s: osMutexUnlock(&raw_dma_mutex)\n", __func__);
+    osMutexUnlock(&raw_dma_mutex);
+
+    TRACE(FPGA_INFO, "%s (done)\n", __func__);
+    return (res == -1) ? FPGA_RES_FAIL : FPGA_RES_OK;
+#else
+    memcpy(data,extern_mem_virtual_base+(address-reservedMemBase),size);
+    TRACE(FPGA_INFO, "%s copy done\n", __func__);
+    return FPGA_RES_OK;
+#endif
+}
+
+/*******************************************************************************/
+
+uint32_t AlteraFPGABoard_DMAWrite(uint8_t* data, uint32_t address, uint32_t size) {
+    uint32_t block_size, i, res = FPGA_RES_OK;
+    TRACE(FPGA_INFO, "%s (data=%p, address=0x%08x, size=%d)\n", __func__, data, address, size);
+    if (!device_file) {
+        return FPGA_RES_NODEV;
+    }
+    if (dma_read_engine < 0) {
+        return FPGA_RES_NODMA;
+    }
+    osMutexLock(&dma_mutex);
+    while (size && !res) {
+        block_size = (size > FPGA_DMA_BLOCK_SIZE) ? FPGA_DMA_BLOCK_SIZE : size;
+        for (i = 0;  i < block_size;  ++i) {
+            dma_buf[FPGA_MANGLE_DMA_ADDRESS(i)] = data[i];
+        }
+        res = AlteraFPGABoard_RawDMAWrite((void*) dma_buf, address * FPGA_DMA_EXPANSION, FPGA_ALIGN_BLOCK_SIZE(block_size * FPGA_DMA_EXPANSION));
+        if (res) {
+            break;
+        }
+        data += block_size;
+        address += block_size;
+        size -= block_size;
+    }
+    osMutexUnlock(&dma_mutex);
+    TRACE(FPGA_INFO, "%s (done)\n", __func__);
+    return res;
+}
+
+/*******************************************************************************/
+
+uint32_t AlteraFPGABoard_DMARead(uint8_t* data, uint32_t address, uint32_t size) {
+    uint32_t block_size, i, res = FPGA_RES_OK;
+    TRACE(FPGA_INFO, "%s (data=%p, address=0x%08x, size=%d)\n", __func__, data, address, size);
+    if (!device_file) {
+        return FPGA_RES_NODEV;
+    }
+    if (dma_read_engine < 0) {
+        return FPGA_RES_NODMA;
+    }
+    osMutexLock(&dma_mutex);
+    while (size && !res) {
+        block_size = (size > FPGA_DMA_BLOCK_SIZE) ? FPGA_DMA_BLOCK_SIZE : size;
+        res = AlteraFPGABoard_RawDMARead((void*) dma_buf, address * FPGA_DMA_EXPANSION, FPGA_ALIGN_BLOCK_SIZE(block_size * FPGA_DMA_EXPANSION));
+        if (res) {
+            break;
+        }
+        for (i = 0;  i < block_size;  ++i) {
+            data[i] = dma_buf[FPGA_MANGLE_DMA_ADDRESS(i)];
+        }
+        data += block_size;
+        address += block_size;
+        size -= block_size;
+    }
+    osMutexUnlock(&dma_mutex);
+    TRACE(FPGA_INFO, "%s (done)\n", __func__);
+    return res;
+}
+
+/*******************************************************************************/
+
+uint32_t AlteraFPGABoard_SetupIRQ(fpga_irq_handle_t *irq, uint32_t mis_addr, uint32_t cis_addr, uint32_t timeout) {
+#if FPGA_USE_KERNEL_IRQ_HANDLING
+    tsRegisterTargetIntSetup rtis;
+    if (!device_file) {
+        return FPGA_RES_NODEV;
+    }
+    if (irq_registered && (irq_registered != irq)) {
+        return FPGA_RES_INVAL;  /* kernel IRQ handling only supports a single handle */
+    }
+    rtis.misAdr = (unsigned int) FPGA_REG_ADDRESS_MOD(mis_addr);
+    rtis.cisAdr = (unsigned int) FPGA_REG_ADDRESS_MOD(cis_addr);
+    rtis.irqTimeout = (unsigned int) timeout;
+    if (ioctl(device_file, REGISTER_TARGET_INT_IOCTL_BASE, &rtis) == -1) {
+        return FPGA_RES_FAIL;
+    }
+    irq_registered = irq;
+#else
+    if (!irq) {
+        return FPGA_RES_INVAL;
+    }
+    if (timeout > (0x7FFFFFFF / 1000)) {
+        return FPGA_RES_INVAL;
+    }
+    irq->mis_addr = mis_addr;
+    irq->cis_addr = cis_addr;
+    irq->timeout = timeout * 1000;
+    irq->cancel = 0;
+#endif
+    return FPGA_RES_OK;
+}
+
+/*******************************************************************************/
+
+uint32_t AlteraFPGABoard_StopIRQ(fpga_irq_handle_t *irq) {
+#if FPGA_USE_KERNEL_IRQ_HANDLING
+    tsRegisterTargetIntSetup rtis;
+    if (!device_file) {
+        return FPGA_RES_NODEV;
+    }
+    rtis.misAdr = rtis.cisAdr = rtis.irqTimeout = 0;
+    if (ioctl(device_file, REGISTER_TARGET_INT_IOCTL_BASE, &rtis) == -1) {
+        return FPGA_RES_FAIL;
+    }
+    irq_registered = NULL;
+#else
+    if (!irq) {
+        return FPGA_RES_INVAL;
+    }
+    irq->mis_addr = 0;
+    irq->cis_addr = 0;
+    irq->timeout = 0;
+    irq->cancel = 1;
+#endif
+    return FPGA_RES_OK;
+}
+
+/*******************************************************************************/
+
+uint32_t AlteraFPGABoard_WaitForIRQ(fpga_irq_handle_t *irq, uint32_t *irq_status) {
+#if FPGA_USE_KERNEL_IRQ_HANDLING
+    static uint32_t dummy_mis;
+    if (irq_status) {
+        *irq_status = 0;
+    }
+    if (!device_file) {
+        return FPGA_RES_NODEV;
+    }
+    if (!irq_registered) {
+        return FPGA_RES_INVAL;
+    }
+    if (ioctl(device_file, WAIT_FOR_TARGET_INT_IOCTL_BASE,
+        irq_status ? irq_status : &dummy_mis) == -1) {
+        return FPGA_RES_FAIL;
+    }
+    return FPGA_RES_OK;
+#else
+    uint32_t mis = 0;
+    int32_t time_left;
+    if (!device_file) {
+        return FPGA_RES_NODEV;
+    }
+    if (!irq) {
+        return FPGA_RES_INVAL;
+    }
+    if (!irq->mis_addr && !irq->cis_addr) {
+        return FPGA_RES_INVAL;
+    }
+    time_left = (int32_t) irq->timeout;
+#if 1
+    while (!irq->cancel && ! irq_cancel_all && (time_left >= 0)) {
+        (void) osMutexLock(&poll_mutex);
+        mis = AlteraFPGABoard_ReadReg(irq->mis_addr);
+        if (mis) {
+            AlteraFPGABoard_WriteReg(irq->cis_addr, mis);
+            (void) osMutexUnlock(&poll_mutex);
+            break;
+        }
+        (void) osMutexUnlock(&poll_mutex);
+        usleep(FPGA_IRQ_POLL_INTERVAL);
+        if (irq->timeout) {
+            time_left -= FPGA_IRQ_POLL_INTERVAL;
+        }
+    }
+#endif
+
+    if(mis != 0) TRACE(FPGA_INFO, "##IRQ read mis: 0x%x\n", mis);
+    if (irq_status) {
+        *irq_status = mis;
+    }
+    return (mis && !irq->cancel && !irq_cancel_all) ? FPGA_RES_OK : FPGA_RES_FAIL;
+#endif
+}
+
+/*******************************************************************************/
+
+uint32_t AlteraFPGABoard_CancelIRQ(fpga_irq_handle_t *irq) {
+#if FPGA_USE_KERNEL_IRQ_HANDLING
+    if (!device_file) {
+        return FPGA_RES_NODEV;
+    }
+    if (!irq_registered) {
+        return FPGA_RES_INVAL;
+    }
+    if (ioctl(device_file, CANCEL_TARGET_INT_IOCTL_BASE, 0) == -1) {
+        return FPGA_RES_FAIL;
+    }
+#else
+    if (!irq) {
+        return FPGA_RES_INVAL;
+    }
+    irq->cancel = 1;
+    usleep(2 * FPGA_IRQ_POLL_INTERVAL);
+#endif
+    return FPGA_RES_OK;
+}
+
+/*******************************************************************************/
+
+#if !FPGA_USE_KERNEL_IRQ_HANDLING
+
+void AlteraFPGABoard_ForbidIRQPolling(void) {
+    (void) osMutexLock(&poll_mutex);
+}
+
+void AlteraFPGABoard_AllowIRQPolling(void) {
+    (void) osMutexUnlock(&poll_mutex);
+}
+
+#endif
+
+/*******************************************************************************/
+
+uint32_t AlteraFPGABoard_SetPLLConfig(const AlteraFPGAPLL_t* pll, const AlteraFPGAPLLConfig_t* cfg) {
+    uint32_t res, i;
+#if 0
+    if (!device_file) {
+        return FPGA_RES_NODEV;
+    }
+
+    if (!pll || !cfg) {
+        return FPGA_RES_INVAL;
+    }
+
+    AlteraFPGABoard_ForbidIRQPolling();
+
+    uint32_t reset_val = AlteraFPGABoard_ReadBAR(FPGA_PLL_CONFIG_BAR, FPGA_PLL_CONFIG_RESET_ADDR);
+    (void) AlteraFPGABoard_WriteBAR(FPGA_PLL_CONFIG_BAR, FPGA_PLL_CONFIG_RESET_ADDR, reset_val & ~(pll->config_reset_mask));
+    (void) AlteraFPGABoard_WriteBAR(FPGA_PLL_CONFIG_BAR, FPGA_PLL_CONFIG_RESET_ADDR, reset_val |   pll->config_reset_mask );
+
+    res = _set_single_pll_counter(pll->reg_offset, 0, cfg->N);
+    if (res != FPGA_RES_OK) { goto __SetPLLConfig_done; }
+
+    res = _set_single_pll_counter(pll->reg_offset, 1, cfg->M);
+    if (res != FPGA_RES_OK) { goto __SetPLLConfig_done; }
+
+    for (i = 0;  i < 9;  ++i) {
+        res = _set_single_pll_counter(pll->reg_offset, i + 4, cfg->C[i]);
+        if (res != FPGA_RES_OK) { goto __SetPLLConfig_done; }
+    }
+
+    res = AlteraFPGABoard_WriteBAR(FPGA_PLL_CONFIG_BAR, pll->reg_offset + FPGA_PLL_CONFIG_RECONFIG_ADDR, 1);
+    if (res != FPGA_RES_OK) { goto __SetPLLConfig_done; }
+
+__SetPLLConfig_done:
+    AlteraFPGABoard_AllowIRQPolling();
+
+    return res;
+#endif
+	return 0;
+}
+
+/*******************************************************************************/
+
+static uint32_t _set_single_pll_param(const uint32_t config_reg_offset, const uint8_t counter_type, const uint8_t counter_param, const uint16_t value) {
+#if 0
+    uint32_t res;
+
+    res = AlteraFPGABoard_WriteBAR(FPGA_PLL_CONFIG_BAR, config_reg_offset + FPGA_PLL_CONFIG_PARAM_ADDR, (counter_param << 4) | counter_type);
+    if (res != FPGA_RES_OK) { return res; }
+
+    res = AlteraFPGABoard_WriteBAR(FPGA_PLL_CONFIG_BAR, config_reg_offset + FPGA_PLL_CONFIG_WR_DATA_ADDR, value);
+    if (res != FPGA_RES_OK) { return res; }
+
+    res = AlteraFPGABoard_WriteBAR(FPGA_PLL_CONFIG_BAR, config_reg_offset + FPGA_PLL_CONFIG_WR_PARAM_ADDR, 1);
+    if (res != FPGA_RES_OK) { return res; }
+#endif
+    return FPGA_RES_OK;
+}
+
+/*******************************************************************************/
+
+static uint32_t _set_single_pll_counter(const uint32_t config_reg_offset, const uint8_t counter_type, const uint16_t value) {
+#if 0
+    uint32_t res;
+
+    res = _set_single_pll_param(config_reg_offset, counter_type, 4, value ? 0 : 1);  /* bypass */
+    if (res != FPGA_RES_OK) { return res; }
+
+    res = _set_single_pll_param(config_reg_offset, counter_type, 0, (value + 1) >> 1);  /* high count */
+    if (res != FPGA_RES_OK) { return res; }
+
+    res = _set_single_pll_param(config_reg_offset, counter_type, 5, value & 1);  /* odd/even */
+    if (res != FPGA_RES_OK) { return res; }
+
+    res = _set_single_pll_param(config_reg_offset, counter_type, 1, value >> 1);  /* low count */
+    if (res != FPGA_RES_OK) { return res; }
+#endif
+    return FPGA_RES_OK;
+}
+
+/*******************************************************************************/
+

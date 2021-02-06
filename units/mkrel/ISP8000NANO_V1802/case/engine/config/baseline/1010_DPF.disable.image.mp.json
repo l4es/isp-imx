@@ -1,0 +1,70 @@
+{
+  "caseConfig":{
+      "ID"  : "1010",
+      "path": "baseline",
+      "name": "1010_DPF.disable.image.mp",
+      "desc": "Disable DPF for mp with RAW8 image input.",
+      "ver" : "0.8.0",
+
+      "engineConfig":[
+          {
+              "engine": {
+                  "type": 2,
+
+                  "mainPathConfig":{
+                      "width"  : 1920 ,
+                      "height" : 1080 ,
+                      "mode"   : 4 ,
+                      "layout" : 2
+                  },
+
+                  "selfPathConfig":{
+                      "width"  : 0 ,
+                      "height" : 0 ,
+                      "mode"   : 1 ,
+                      "layout" : 2
+                  }
+              },
+
+              "verifyCurFrame"        : 1 ,
+              "frameNum"              : 1 ,
+              "enableDPF"             : 0 ,
+              "enableTPG"             : 1 ,
+              "imageType"             : 2 ,
+              "bayerPattern"          : 0 ,
+              "colorDepth"            : 0 ,
+              "resolution"            : 0 ,
+              "pixleGap"              : 960 ,
+              "lineGap"               : 360 ,
+              "gapStandard"           : 240 ,
+              "randomSeed"            : 2863311530 ,
+              "h_total"               : 2844 ,
+              "h_fp"                  : 308 ,
+              "h_bp"                  : 308 ,
+              "h_w"                   : 308 ,
+              "h_act"                 : 1920 ,
+              "v_total"               : 1968 ,
+              "v_fp"                  : 5 ,
+              "v_bp"                  : 881 ,
+              "v_w"                   : 2 ,
+              "v_act"                 : 1080 ,
+
+              "input":{
+                  "goldenFiles": [
+                        {"fileName": "1010_DPF.disable.image.mp.00.ppm"}
+                  ],
+                  "images": [
+                      {"fileName": "RAW8_20100101_005155.pgm"}
+                  ]
+              },
+
+              "output":{
+                  "images": [
+                        {"fileName": "1010_DPF.disable.image.mp.00"}
+                  ]
+              }
+
+          }
+      ]
+  }
+}

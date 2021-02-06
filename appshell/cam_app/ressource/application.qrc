@@ -1,0 +1,31 @@
+<!DOCTYPE RCC><RCC version="1.0">
+<qresource>
+    <file>images/new.png</file>
+    <file>images/open.png</file>
+    <file>images/save.png</file>
+
+    <file>images/copy.png</file>
+    <file>images/cut.png</file>
+    <file>images/paste.png</file>
+
+    <file>images/original.png</file>
+    <file>images/hflip.png</file>
+    <file>images/vflip.png</file>
+    <file>images/rotate-left.png</file>
+    <file>images/rotate-right.png</file>
+
+    <file>images/screenshot.png</file>
+    <file>images/sensor.png</file>
+
+    <file>images/nobody.png</file>
+    <file>images/face.png</file>
+    <file>images/verify.png</file>
+    <file>images/smile.png</file>
+    <file>images/blink.png</file>
+    <file>images/sex.png</file>
+    <file>images/baby.png</file>
+
+    <file>images/afps.png</file>
+    <file>images/noafps.png</file>
+</qresource>
+</RCC>

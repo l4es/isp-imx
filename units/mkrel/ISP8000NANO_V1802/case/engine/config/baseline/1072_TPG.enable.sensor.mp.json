@@ -1,0 +1,56 @@
+{
+  "caseConfig":{
+      "ID"  : "1072",
+      "path": "baseline",
+      "name": "1072_TPG.enable.sensor.mp",
+      "desc": "Enable test pattern with sendor input and mp output.",
+      "ver" : "0.8.0",
+
+      "engineConfig":[
+          {
+              "engine": {
+                  "type": 3,
+
+                  "mainPathConfig":{
+                      "width"  : 1920 ,
+                      "height" : 1080 ,
+                      "mode"   : 4 ,
+                      "layout" : 2
+                  },
+
+                  "selfPathConfig":{
+                      "width"  : 0 ,
+                      "height" : 0 ,
+                      "mode"   : 1 ,
+                      "layout" : 2
+                  }
+              },
+
+              "verifyCurFrame"        : 1 ,
+              "frameNum"              : 1 ,
+              "enableTPG"             : 1 ,
+              "imageType"             : 3 ,
+              "bayerPattern"          : 0 ,
+              "colorDepth"            : 0 ,
+              "resolution"            : 0 ,
+              "gapStandard"           : 240 ,
+
+              "input":{
+                  "goldenFiles": [
+                        {"fileName": "1072_TPG.enable.sensor.mp.00.ppm"}
+                  ],
+                  "images": [
+                      {"fileName": "RAW8_20100101_005155.pgm"}
+                  ]
+              },
+
+              "output":{
+                  "images": [
+                        {"fileName": "1072_TPG.enable.sensor.mp.00"}
+                  ]
+              }
+
+          }
+      ]
+  }
+}

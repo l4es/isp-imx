@@ -1,0 +1,74 @@
+{
+  "caseConfig":{
+      "ID"  : "1025",
+      "path": "baseline",
+      "name": "1025_IE.enable.image.mp",
+      "desc": "enable IE for mp with RAW8 image input and use GRAYSCALE mode .",
+      "ver" : "0.8.0",
+
+      "engineConfig":[
+          {
+              "engine": {
+                  "type": 3,
+
+                  "mainPathConfig":{
+                      "width"  : 1920 ,
+                      "height" : 1080 ,
+                      "mode"   : 4 ,
+                      "layout" : 2
+                  },
+
+                  "selfPathConfig":{
+                      "width"  : 0 ,
+                      "height" : 0 ,
+                      "mode"   : 1 ,
+                      "layout" : 2
+                  }
+              },
+
+              "verifyCurFrame"        : 1 ,
+              "frameNum"              : 1 ,
+              "IeWorkingMode"         : 1 ,
+              "IeRange"               : 2 ,
+              "IeSepiaTint"           : 127 ,
+              "IeColorSel"            : 5 ,
+              "IeColorThreshold"      : 127 ,
+              "enableTPG"             : 1 ,
+              "imageType"             : 1 ,
+              "bayerPattern"          : 0 ,
+              "colorDepth"            : 0 ,
+              "resolution"            : 0 ,
+              "pixleGap"              : 960 ,
+              "lineGap"               : 360 ,
+              "gapStandard"           : 240 ,
+              "randomSeed"            : 2863311530 ,
+              "h_total"               : 2844 ,
+              "h_fp"                  : 308 ,
+              "h_bp"                  : 308 ,
+              "h_w"                   : 308 ,
+              "h_act"                 : 1920 ,
+              "v_total"               : 1968 ,
+              "v_fp"                  : 5 ,
+              "v_bp"                  : 881 ,
+              "v_w"                   : 2 ,
+              "v_act"                 : 1080 ,
+
+              "input":{
+                  "goldenFiles": [
+                        {"fileName": "1025_IE.enable.image.mp.00.ppm"}
+                  ],
+                  "images": [
+                      {"fileName": "RAW8_20100101_005155.pgm"}
+                  ]
+              },
+
+              "output":{
+                  "images": [
+                        {"fileName": "1025_IE.enable.image.mp.00"}
+                  ]
+              }
+
+          }
+      ]
+  }
+}

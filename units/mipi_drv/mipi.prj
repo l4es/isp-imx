@@ -1,0 +1,62 @@
+[Project ID]
+Signature=UE Proj: v.1
+[Project Information]
+Compilable=0
+Use Relative Directory=1
+Relative to Project File=1
+Project Directory=
+Include Sub Directories=1
+Project Tagfile=..\ctags.lst
+Project Wordfile=
+Filter=
+Using VCS=0
+Save Account=0
+Create Tagfile=1
+CTags Legacy Support=1
+[uemakeXp]
+ReleaseMode=0
+[Debug Settings]
+Program Arguments=
+Symbol Paths=
+Working Directory=
+Selected Debugger=0
+Source Paths=
+[Group]
+0=build
+1=include
+2=source
+3=test
+[Files - build]
+0=CMakeLists.txt
+1=unit_test\CMakeLists.txt
+2=..\CMakeLists.txt
+[Files - include]
+0=include\mipi_drv_api.h
+1=include\mipi_drv_common.h
+2=include_priv\mipi_drv.h
+3=include_priv\mipi_drv_phy.h
+4=..\common\include\return_codes.h
+5=..\hal\include\hal_api.h
+6=..\hal\include\hal_altera_pci.h
+7=..\common\include\mipi.h
+8=include_priv\mipi_drv_rec.h
+9=include_priv\mipi_drv_phy_std02.h
+10=..\cameric_drv\include\cameric_mipi_drv_api.h
+11=..\cameric_drv\include\cameric_drv_common.h
+12=..\cameric_drv\include\cameric_drv_api.h
+13=..\cameric_drv\include_priv\cameric_drv.h
+14=..\cam_engine\include\cam_engine_api.h
+15=..\cam_engine\include_priv\cam_engine_modules.h
+[Files - source]
+0=source\mipi_drv.c
+1=source\mipi_drv_api.c
+2=source\mipi_drv_phy_std02.c
+3=..\cameric_drv\source\cameric.c
+4=..\cameric_drv\source\cameric_mipi.c
+5=..\cam_engine\source\cam_engine_drv.c
+6=..\cam_engine\source\cam_engine_api.c
+7=..\cam_engine\source\cam_engine.c
+8=..\cam_engine\source\cam_engine_modules.c
+[Files - test]
+0=unit_test\runner\unitTestRunner.c
+1=unit_test\tests\mipi_drv_ut.c

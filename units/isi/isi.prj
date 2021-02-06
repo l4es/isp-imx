@@ -1,0 +1,112 @@
+[Project ID]
+Signature=UE Proj: v.1
+[Project Information]
+Compilable=1
+Use Relative Directory=1
+Relative to Project File=1
+Project Directory=
+Include Sub Directories=1
+Project Tagfile=
+Project Wordfile=
+Filter=
+Using VCS=1
+Save Account=1
+Create Tagfile=0
+CTags Legacy Support=0
+[uemakeXp]
+ReleaseMode=0
+[Debug Settings]
+Program Arguments=
+Symbol Paths=
+Working Directory=
+Selected Debugger=0
+Source Paths=
+[Group]
+0=build
+1=include
+2=source
+3=drivers - OV2715
+4=drivers - OV5630
+5=drivers - OV8810
+6=drivers - OV14825
+7=unittest
+8=_aaa
+[Files - build]
+0=..\CMakeLists.txt
+1=CMakeLists.txt
+2=drv\OV2715\CMakeLists.txt
+3=drv\OV5630\CMakeLists.txt
+4=drv\OV8810\CMakeLists.txt
+5=drv\OV14825\CMakeLists.txt
+6=unit_test\CMakeLists.txt
+[Files - include]
+0=..\common\include\return_codes.h
+1=include\isi_common.h
+2=include\isi_iss.h
+3=include\isi.h
+4=include_priv\isi_priv.h
+[Files - source]
+0=source\isisup.c
+1=source\isi.c
+[Files - drivers - OV2715]
+0=drv\OV2715\include_priv\OV2715_a.h
+1=drv\OV2715\include_priv\OV2715_d50.h
+2=drv\OV2715\include_priv\OV2715_d65.h
+3=drv\OV2715\include_priv\OV2715_d75.h
+4=drv\OV2715\include_priv\OV2715_f11.h
+5=drv\OV2715\include_priv\OV2715_f2.h
+6=drv\OV2715\include_priv\OV2715_priv.h
+7=drv\OV2715\source\OV2715.c
+8=drv\OV2715\source\OV2715_tables.c
+[Files - drivers - OV5630]
+0=drv\OV5630\include_priv\OV5630_a.h
+1=drv\OV5630\include_priv\OV5630_d50.h
+2=drv\OV5630\include_priv\OV5630_d60.h
+3=drv\OV5630\include_priv\OV5630_d65.h
+4=drv\OV5630\include_priv\OV5630_d75.h
+5=drv\OV5630\include_priv\OV5630_d80.h
+6=drv\OV5630\include_priv\OV5630_d120.h
+7=drv\OV5630\include_priv\OV5630_f11.h
+8=drv\OV5630\include_priv\OV5630_f12.h
+9=drv\OV5630\include_priv\OV5630_f2.h
+10=drv\OV5630\include_priv\OV5630_priv.h
+11=drv\OV5630\source\OV5630.c
+12=drv\OV5630\source\OV5630_tables.c
+[Files - drivers - OV8810]
+0=drv\OV8810\include_priv\OV8810_a.h
+1=drv\OV8810\include_priv\OV8810_d50.h
+2=drv\OV8810\include_priv\OV8810_d65.h
+3=drv\OV8810\include_priv\OV8810_d75.h
+4=drv\OV8810\include_priv\OV8810_f11.h
+5=drv\OV8810\include_priv\OV8810_f2.h
+6=drv\OV8810\include_priv\OV8810_priv.h
+7=drv\OV8810\source\OV8810.c
+8=drv\OV8810\source\OV8810_tables.c
+[Files - drivers - OV14825]
+0=drv\OV14825\include_priv\OV14825_MIPI_priv.h
+1=drv\OV14825\include_priv\OV14825_MIPI_a.h
+2=drv\OV14825\include_priv\OV14825_MIPI_d50.h
+3=drv\OV14825\include_priv\OV14825_MIPI_d65.h
+4=drv\OV14825\include_priv\OV14825_MIPI_d75.h
+5=drv\OV14825\include_priv\OV14825_MIPI_f2.h
+6=drv\OV14825\include_priv\OV14825_MIPI_f11.h
+7=drv\OV14825\source\OV14825.c
+8=drv\OV14825\source\OV14825_tables.c
+
+[Files - unittest]
+0=unit_test\runner\unitTestRunner.c
+1=unit_test\tests\isi_ut.c
+2=unit_test\tests\mock\modulexy_mock.c
+[Files - _aaa]
+0=..\aaa\aec\include\aec.h
+1=..\aaa\aec\include_priv\sem.h
+2=..\aaa\aec\include_priv\aec_ctrl.h
+3=..\aaa\aec\include_priv\asem.h
+4=..\aaa\aec\include_priv\clm.h
+5=..\aaa\aec\include_priv\ecm.h
+6=..\aaa\aec\source\sem.c
+7=..\aaa\aec\source\aec.c
+8=..\aaa\aec\source\asem.c
+9=..\aaa\aec\source\clm.c
+10=..\aaa\aec\source\ecm.c
+11=..\aaa\aec\unit_test\tests\aec_ut.c

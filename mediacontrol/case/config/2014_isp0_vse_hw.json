@@ -1,0 +1,73 @@
+{
+  "?supported components" : [ "NativeIsp", "NativeDewarp", "NativeResize", "LocalDisplay", "V4l2Control", "FakeSource" ],
+
+  "using components" : ["NativeIsp", "NativeResize", "LocalDisplay"],
+
+  "streams" : [
+    {
+      "links" : [
+        { "prev" : "NativeIsp", "srcpad" : 0,  "next" : "LocalDisplay", "sinkpad": 0 }
+      ],
+      "caps" : {
+        "availableStreamConfigurations" : [
+          ["YUV422SP", 1920, 1080],
+          ["YUV422SP", 1280, 720],
+          ["YUV422SP", 640,  480]
+        ]
+      }
+    },
+    {
+      "links" : [
+        { "prev" : "NativeIsp", "srcpad" : 0, "next" : "NativeResize", "sinkpad": 0 },
+        { "prev" : "NativeResize", "srcpad" : 0, "next" : "LocalDisplay", "sinkpad": 1 }
+      ],
+      "caps" : {
+        "availableStreamConfigurations" : [
+          ["YUV422SP", 1920, 1080],
+          ["YUV422SP", 1280, 720],
+          ["YUV422SP", 640,  480]
+        ]
+      }
+    },
+    {
+      "links" : [
+        { "prev" : "NativeResize", "srcpad" : 1, "next" : "LocalDisplay", "sinkpad": 2 }
+      ],
+      "caps" : {
+        "availableStreamConfigurations" : [
+          ["YUV422SP", 1920, 1080],
+          ["YUV422SP", 1280, 720],
+          ["YUV422SP", 640,  480]
+        ]
+      }
+    },
+    {
+      "links" : [
+        { "prev" : "NativeResize", "srcpad" : 2, "next" : "LocalDisplay", "sinkpad": 3 }
+      ],
+      "caps" : {
+        "availableStreamConfigurations" : [
+          ["YUV422SP", 1280, 720],
+          ["YUV422SP", 640,  480]
+        ]
+      }
+    },
+    {
+      "links" : [
+        {"prev" : "NativeIsp", "srcpad" : 1, "next" : "NativeResize", "sinkpad": 1},
+        {"prev" : "NativeResize", "srcpad" : 3, "next" : "LocalDisplay", "sinkpad": 4}
+      ],
+      "caps" : {
+        "availableStreamConfigurations" : [
+          ["METADATA", 0, 0]
+        ]
+      }
+    }
+  ],
+  "isp" : {
+    "config" : "case/isp/1003_isp_full_config.json"
+  },
+  "resize" : {
+    "config" : "case/vse/1080p_input_all_path.json"
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "?supported components" : [ "NativeIsp", "NativeDewarp", "LocalDisplay", "V4l2Control", "FakeSource" ],
+
+  "using components" : [
+    {
+      "classname" : "FakeSource",
+      "id" : "fake"
+    },
+    {
+      "classname" : "V4l2Control",
+      "id" : "v4l2"
+    }
+  ],
+
+  "streams" : [
+    {
+      "links" : [
+        { "prev" : "fake", "srcpad" : 0, "next" : "v4l2", "sinkpad": 0}
+      ],
+      "caps" : {
+        "availableStreamConfigurations" : [
+          ["YUV422SP", 1280, 720],
+          ["YUV422SP", 1920, 1080],
+          ["YUV420SP", 1280, 720],
+          ["YUV420SP", 1920, 1080],
+          ["YUV422I", 1280, 720],
+          ["YUV422I", 1920, 1080]
+        ]
+      }
+    }
+  ]
+}

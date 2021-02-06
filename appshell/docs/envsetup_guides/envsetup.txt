@@ -1,0 +1,13 @@
+V3.1 env setup
+**One machine only need to setup one time.
+
+repo init --repo-url=<your-path-to-repo>/git-repo  -u ssh://potato/manifest -m ispv3.1.x_envsetup.xml
+
+*Install VSI ISP environments
+1- cd utils3rd/script
+2- sudo ./rm_vsi_env  (Remove old envs)
+3- sudo ./setup_vsi_isp_runtime_linux (install runtime scripts)
+4- sudo ./setup_vsi_isp_tools (install QT tools)
+5- sudo ./setup_vsi_isp_kernel_tree (install kernel trees)
+
+

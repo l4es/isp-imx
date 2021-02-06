@@ -1,0 +1,69 @@
+{
+  "caseConfig":{
+      "ID"  : "2021",
+      "path": "format",
+      "name": "2021_format.RAW8.RAW12.mp",
+      "desc": "format convertion from RAW8 to RAW12 in MP",
+      "ver" : "0.8.0",
+
+      "engineConfig":[
+          {
+              "engine": {
+                  "type": 2,
+
+                  "mainPathConfig":{
+                      "width"  : 600 ,
+                      "height" : 600 ,
+                      "mode"   : 11 ,
+                      "layout" : 2
+                  },
+
+                  "selfPathConfig":{
+                      "width"  : 0 ,
+                      "height" : 0 ,
+                      "mode"   : 1 ,
+                      "layout" : 2
+                  }
+              },
+
+              "verifyCurFrame"        : 1 ,
+              "frameNum"              : 1 ,
+              "enableTPG"             : 1 ,
+              "imageType"             : 4 ,
+              "bayerPattern"          : 0 ,
+              "colorDepth"            : 0 ,
+              "resolution"            : 3 ,
+              "pixleGap"              : 200 ,
+              "lineGap"               : 200 ,
+              "gapStandard"           : 75 ,
+              "randomSeed"            : 2863311530 ,
+              "h_total"               : 700 ,
+              "h_fp"                  : 0 ,
+              "h_bp"                  : 0 ,
+              "h_w"                   : 100 ,
+              "h_act"                 : 600 ,
+              "v_total"               : 700 ,
+              "v_fp"                  : 0 ,
+              "v_bp"                  : 0 ,
+              "v_w"                   : 100 ,
+              "v_act"                 : 600 ,
+
+              "input":{
+                  "goldenFiles": [
+                        {"fileName": "2021_format.RAW8.RAW12.mp.00.pgm"}
+                  ],
+                  "images": [
+                      {"fileName": "SiemensStar_bp_600x600_8.pgm"}
+                  ]
+              },
+
+              "output":{
+                  "images": [
+                        {"fileName": "2021_format.RAW8.RAW12.mp.00"}
+                  ]
+              }
+
+          }
+      ]
+  }
+}

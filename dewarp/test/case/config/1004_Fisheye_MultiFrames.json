@@ -1,0 +1,57 @@
+{
+  "ID": "1004",
+  "desc": "Test VSI dewarp MultiFrames",
+  "ver": "1.0.0",
+  "date": "2019/04/06 16:00:00",
+
+  "?dewarpMode": "LENS_CORRECTION, FISHEYE_EXPAND, SPLIT_SCREEN",
+  "?format": "YUV422SP, YUV422I, YUV420SP",
+  "dewarpMode": "SPLIT_SCREEN",
+  
+  "scale": {
+    "roix": 0,
+    "roiy": 0,
+    "factor": 1.0
+  },
+  "input": {
+    "file": "case/resource/fisheye_420SP_1432x1432_30frames.yuv",
+    "width": 1432,
+    "height": 1432,
+    "format": "YUV420SP"
+  },
+  "output": {
+    "format": "YUV420SP"
+  },
+  "split": {
+    "horizon_line": 716,
+    "vertical_line_up": 716,
+    "vertical_line_down": 716
+  },
+
+  "camera_matrix": [
+    6.5516074404594690e+002,
+    0.0,
+    9.6420599053623062e+002,
+    0.0,
+    6.5552406676868952e+002,
+    5.3203601317192908e+002,
+    0.0,
+    0.0,
+    1.0
+  ],
+  "distortion_coeff": [
+    -2.2095698671518085e-002,
+    3.8543889520066955e-003,
+    -5.9060355970132873e-003,
+    1.9007362178503509e-003,
+    0.0,
+    0.0,
+    0.0,
+    0.0
+  ],
+  "perspective": [
+    1.0, 0, 0, 0, 1, 0, 0, 0, 1
+  ],
+  "goldenHashKey" : "16786788671970120517"
+}
+

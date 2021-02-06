@@ -1,0 +1,49 @@
+[Project ID]
+Signature=UE Proj: v.1
+[Project Information]
+Compilable=1
+Use Relative Directory=1
+Relative to Project File=1
+Project Directory=
+Include Sub Directories=1
+Project Tagfile=
+Project Wordfile=
+Filter=
+Using VCS=0
+Save Account=0
+Create Tagfile=0
+CTags Legacy Support=0
+[uemakeXp]
+ReleaseMode=0
+[Debug Settings]
+Program Arguments=
+Symbol Paths=
+Working Directory=
+Selected Debugger=0
+Source Paths=
+[Group]
+0=build
+1=include
+2=source
+3=test
+[Files - build]
+0=CMakeLists.txt
+1=unit_test\CMakeLists.txt
+[Files - include]
+0=include\vom_ctrl_api.h
+1=include\vom_ctrl_common.h
+2=include_priv\vom_ctrl.h
+3=include_priv\vom_ctrl_mvdu.h
+4=include_priv\vom_ctrl_hdmi.h
+5=..\common\include\return_codes.h
+6=..\common\include\hdmi_3d.h
+7=..\common\include\cea_861.h
+8=..\common\include\picture_buffer.h
+[Files - source]
+0=source\vom_ctrl.c
+1=source\vom_ctrl_api.c
+2=source\vom_ctrl_mvdu.c
+3=source\vom_ctrl_hdmi.c
+[Files - test]
+0=unit_test\runner\unitTestRunner.c
+1=unit_test\tests\vom_ctrl_ut.c

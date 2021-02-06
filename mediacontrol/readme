@@ -1,0 +1,16 @@
+BUILD MEDIACONTROL
+    cd mediacontrol
+    mkdir build
+    cd build
+    cmake .. -DV4L2=ON -DDAEMON_NATIVE=OFF -DGDB=OFF -DWITH_VSE=OFF -DWITH_DWE=ON -DWITH_DW200=OFF -DPLATFORM=X86
+	or
+    cmake .. -DV4L2=ON -DDAEMON_NATIVE=OFF -DGDB=OFF -DWITH_VSE=OFF -DWITH_DWE=OFF -DWITH_DW200=ON -DPLATFORM=X86
+	or
+    cmake .. -DV4L2=ON -DDAEMON_NATIVE=ON -DGDB=OFF -DWITH_VSE=OFF -DWITH_DWE=OFF -DWITH_DW200=ON -DPLATFORM=X86
+    make
+
+RUN TEST
+    cd build/daemon
+    export LD_LIBRARY_PATH=$pwd:$LD_LIBRARY_PATH
+    sudo ./isp_media_server
+

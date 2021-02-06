@@ -1,0 +1,29 @@
+#/******************************************************************************\
+#|* Copyright (c) <2020> by VeriSilicon Holdings Co., Ltd. ("VeriSilicon")     *|
+#|* All Rights Reserved.                                                       *|
+#|* Copyright (c) <2010> by Silicon Image, Inc., used with permission by       *|
+#|* VeriSilicon.                                                               *|
+#|*                                                                            *|
+#|* The material in this file is confidential and contains trade secrets of    *|
+#|* of VeriSilicon.  This is proprietary information owned or licensed by      *|
+#|* VeriSilicon.  No part of this work may be disclosed, reproduced, copied,   *|
+#|* transmitted, or used in any way for any purpose, without the express       *|
+#|* written permission of VeriSilicon.                                         *|
+#|*                                                                            *|
+#\******************************************************************************/
+
+if [ -d "/opt/vsi_isp_tools" ]; then
+    echo "/opt/vsi_isp_tools exist, removing"
+    rm /opt/vsi_isp_tools -rf 
+else
+    echo "/opt/vsi_isp_tools does not exist, bypass"
+fi
+
+if [ -d "/opt/vsi_isp_kernel_tree" ]; then
+    echo "/opt/vsi_isp_kernel_tree exist, removing"
+    rm /opt/vsi_isp_kernel_tree -rf 
+else
+    echo "/opt/vsi_isp_kernel_tree does not exist, bypass"
+fi
+
+echo "vsi_isp_kernel_tree remove successfully!"

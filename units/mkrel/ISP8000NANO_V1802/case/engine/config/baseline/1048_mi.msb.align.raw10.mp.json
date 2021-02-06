@@ -1,0 +1,70 @@
+{
+  "caseConfig":{
+      "ID"  : "1048",
+      "path": "baseline",
+      "name": "1048_mi.msb.align.raw10.mp",
+      "desc": "MP MSB alignment with RAW10 input.",
+      "ver" : "0.8.0",
+
+      "engineConfig":[
+          {
+              "engine": {
+                  "type": 2,
+
+                  "mainPathConfig":{
+                      "width"  : 800 ,
+                      "height" : 600 ,
+                      "mode"   : 13 ,
+                      "layout" : 2
+                  },
+
+                  "selfPathConfig":{
+                      "width"  : 0 ,
+                      "height" : 0 ,
+                      "mode"   : 1 ,
+                      "layout" : 2
+                  }
+              },
+
+              "verifyCurFrame"        : 1 ,
+              "frameNum"              : 1 ,
+              "MpLsbAlignment"        : 0 ,
+              "enableTPG"             : 1 ,
+              "imageType"             : 4 ,
+              "bayerPattern"          : 0 ,
+              "colorDepth"            : 1 ,
+              "resolution"            : 3 ,
+              "pixleGap"              : 266 ,
+              "lineGap"               : 200 ,
+              "gapStandard"           : 100 ,
+              "randomSeed"            : 2863311530 ,
+              "h_total"               : 900 ,
+              "h_fp"                  : 0 ,
+              "h_bp"                  : 0 ,
+              "h_w"                   : 100 ,
+              "h_act"                 : 800 ,
+              "v_total"               : 700 ,
+              "v_fp"                  : 0 ,
+              "v_bp"                  : 0 ,
+              "v_w"                   : 100 ,
+              "v_act"                 : 600 ,
+
+              "input":{
+                  "goldenFiles": [
+                        {"fileName": "1048_mi.msb.align.raw10.mp.00.pgm"}
+                  ],
+                  "images": [
+                      {"fileName": "building_site_800x600_bl_bay_10_rg.pgm"}
+                  ]
+              },
+
+              "output":{
+                  "images": [
+                        {"fileName": "1048_mi.msb.align.raw10.mp.00"}
+                  ]
+              }
+
+          }
+      ]
+  }
+}

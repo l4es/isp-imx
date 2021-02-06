@@ -1,0 +1,92 @@
+{
+  "caseConfig":{
+      "ID"  : "1008",
+      "path": "baseline",
+      "name": "1008_DPCC.enable.image.mp",
+      "desc": "Enable DPCC for mp with RAW8 image input.",
+      "ver" : "0.8.0",
+
+      "engineConfig":[
+          {
+              "engine": {
+                  "type": 2,
+
+                  "mainPathConfig":{
+                      "width"  : 1920 ,
+                      "height" : 1080 ,
+                      "mode"   : 4 ,
+                      "layout" : 2
+                  },
+
+                  "selfPathConfig":{
+                      "width"  : 0 ,
+                      "height" : 0 ,
+                      "mode"   : 1 ,
+                      "layout" : 2
+                  }
+              },
+
+              "verifyCurFrame"        : 1 ,
+              "frameNum"              : 1 ,
+              "enableDpcc"            : 1 ,
+              "DpccSensorGain"        : 1.0 ,
+              "DpccMode"              : 4 ,
+              "DpccOutputMode"        : 3 ,
+              "DpccSetUse"            : 7 ,
+              "DpccMethodsSet1"       : 771 ,
+              "DpccMethodsSet2"       : 771 ,
+              "DpccMethodsSet3"       : 771 ,
+              "DpccLineThs1"          : 2056 ,
+              "DpccLineMadFac1"       : 1028 ,
+              "DpccPgFac1"            : 1027 ,
+              "DpccRndThs1"           : 2570 ,
+              "DpccRgFac1"            : 8224 ,
+              "DpccLineThs2"          : 4108 ,
+              "DpccLineMadFac2"       : 6160 ,
+              "DpccPgFac2"            : 1027 ,
+              "DpccRndThs2"           : 2056 ,
+              "DpccRgFac2"            : 2056 ,
+              "DpccLineThs3"          : 8224 ,
+              "DpccLineMadFac3"       : 1028 ,
+              "DpccPgFac3"            : 1027 ,
+              "DpccRndThs3"           : 2054 ,
+              "DpccRgFac3"            : 1028 ,
+              "enableTPG"             : 1 ,
+              "imageType"             : 0 ,
+              "bayerPattern"          : 0 ,
+              "colorDepth"            : 0 ,
+              "resolution"            : 0 ,
+              "pixleGap"              : 960 ,
+              "lineGap"               : 360 ,
+              "gapStandard"           : 240 ,
+              "randomSeed"            : 2863311530 ,
+              "h_total"               : 2844 ,
+              "h_fp"                  : 308 ,
+              "h_bp"                  : 308 ,
+              "h_w"                   : 308 ,
+              "h_act"                 : 1920 ,
+              "v_total"               : 1968 ,
+              "v_fp"                  : 5 ,
+              "v_bp"                  : 881 ,
+              "v_w"                   : 2 ,
+              "v_act"                 : 1080 ,
+
+              "input":{
+                  "goldenFiles": [
+                        {"fileName": "1008_DPCC.enable.image.mp.00.ppm"}
+                  ],
+                  "images": [
+                      {"fileName": "RAW8_20100101_005155.pgm"}
+                  ]
+              },
+
+              "output":{
+                  "images": [
+                        {"fileName": "1008_DPCC.enable.image.mp.00"}
+                  ]
+              }
+
+          }
+      ]
+  }
+}

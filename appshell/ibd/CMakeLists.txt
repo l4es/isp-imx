@@ -1,0 +1,46 @@
+cmake_minimum_required(VERSION 2.6)
+
+# define module name
+set (module appshell_ibd)
+
+# we want to compile all .c files as default
+file(GLOB libsources source/*.c source/fonts/*.c)
+
+# set public headers, these get installed
+file(GLOB pub_headers include/*.h)
+
+# define include paths
+include_directories(
+    include
+    include_priv
+    ${LIB_ROOT}/${CMAKE_BUILD_TYPE}/include
+    )
+
+# module specific defines
+###add_definitions(-Wno-error=unused-function)
+###add_definitions(-DIBD_PPS) ### turn on drawing speed measurements
+set ( CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -O3" ) ### force optimization to speed up color blending stuff
+
+# add lib to build env
+add_library(${module}_shared SHARED ${libsources})
+
+SET_TARGET_PROPERTIES(${module}_shared PROPERTIES OUTPUT_NAME     ${module})
+SET_TARGET_PROPERTIES(${module}_shared PROPERTIES LINK_FLAGS      -shared)
+SET_TARGET_PROPERTIES(${module}_shared PROPERTIES FRAMEWORK       TRUE PUBLIC_HEADER "${pub_headers}")
+
+# define lib dependencies
+#target_link_libraries(${module}_shared
+#                      ${platform_libs}
+#                      ${base_libs}
+#                      )
+
+# define stuff to install
+install(TARGETS ${module}_shared
+        PUBLIC_HEADER   DESTINATION ${CMAKE_INSTALL_PREFIX}/include/${module}
+        ARCHIVE         DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/${module}
+        LIBRARY         DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/${module}
+        )
+
+# create common targets for this module
+include(${CMAKE_HOME_DIRECTORY}/targets.cmake)
+

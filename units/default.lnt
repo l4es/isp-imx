@@ -1,0 +1,110 @@
+//
+// default lint options for ruicore
+//
+
+// disable warnings for library headers:
+-wlib(1)
+
+
+//
+// library headers are:
+// ... all headers found via -i or --i parameters (in .lnt files) or -I commandline Parameters ...
++libclass()
+//consider all headers in <> as library headers
++libclass(angle)
+// ... exept headers found in sw_generated/include
++libdir(/usr/include/)
++libh(ncl_types.h)
++libh(cepc_mesg.h)
++libh(ceprd_mesg.h)
++libh(sii_endian.h)
++libh(ceprui_mesg.h)
++libh(cepsm_mesg.h)
++libh(cepda_mesg.h)
++libh(cep_mesg.h)
++libh(osal.h)
+
+
++linebuf
++macros
++macros
++macros
++macros
++macros
++macros
+
+
+//No warnings in library headers, we do not want to lint them
+-elib(*)
+
+//-efile(43, /usr/include/gconv.h)
+-esym(43, __gconv_info::__data)
+
+// set the warning level
+// 0 -- no messages (except fatal errors)
+// 1 -- errors
+// 2 -- errors + warnings
+// 3 -- errors + warnings + infos
+// 4 -- all messages
+-w3        // general-w2
+
+// report in error messages are the full path names
+//+ffn
+
+// unit checkout (???)
+-u
+// exit with error code 0 if reported error code is bigger or equal to 765
+// external ... could be made static
+-zero(765)
+
+-rw(this) // we are not using c++, so we use this as identifier name
++rw(inline) // enable the inline keyword
+
+-e537	// dont care about repeated includes. They should have their include
+		// guards anyway.
+
+-e830	// Location cited in prior message. Eclipse shows this as error
+-e831	// even if original issue is only a warning. This is very confusing.
++e715   // we want to see infos about unused parameters
+
+//disable 923: cast from pointer to unsigned long [MISRA 2004 Rule 11.3] when using CAST_POINTER_TO_UINT32
+//disable 923: cast from unsigned long to pointer [MISRA 2004 Rule 11.3] when using CAST_UINT32_TO_POINTER
+-emacro(923,
+        CAST_POINTER_TO_UINT32,
+        CAST_UINT32_TO_POINTER) // we need to cast pointer to value and vice versa for HW accesses
+                                // if the CAST_POINTER_TO_UINT32 or CAST_UINT32_TO_POINTER macro is used,
+                                // MISRA 2004 Rule 11.3 will not appear
+
+-function(exit,exit_) // this is to make lint recognize our ASSERT
+
+
+// +rw(inline) seems not to work that is why we disable the warning about inline
+-esym(950, inline)
+
+// This warning applies to the inline problem and must be disabled too
+// warning: 960: Violates MISRA 2004 Required Rule 8.5, no object/function
+// definitions in header files
+-esym(960, 8.5)
+
+// must be disabled cause it is used in all CT_XXX macros
+//  warning: 717: do ... while(0);
+-e717
+
+
+// lint always in non debug mode:
+-dNDEBUG
+
+// define a compiler constant:
+-d__INT_MAX__=2147483647
+
+-h3
+-width(0)
+
+-"format=%f:%l: warning: %n: %m"
+
+-t4
+
+// use absolute filenames in output:
++ffn
+
+//-vf

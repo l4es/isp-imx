@@ -1,0 +1,28 @@
+{
+	"?dewarpMode" : "LENS_CORRECTION, FISHEYE_EXPAND, SPLIT_SCREEN",
+	"?format" : "YUV422SP, YUV422I, YUV420SP",
+	"ID" : "1001_DW_SPLIT_4",
+	"date" : "2019/04/06 16:00:00",
+	"desc" : "Test VSI dewarp split 4 function.",
+	"dewarpMode" : "FISHEYE_EXPAND",
+	"goldenHashKey" : "18087882552592627266",
+	"input" : 
+	{
+		"file" : "case/resource/fisheye_422SP_1440x1440.yuv",
+		"format" : "YUV422SP",
+		"height" : 1440,
+		"width" : 1440
+	},
+	"output" : 
+	{
+		"format" : "YUV422SP"
+	},
+	"scale" : 
+	{
+		"factor" : 1.0,
+		"roix" : 0,
+		"roiy" : 0
+	},
+	"userMap" : "case/usermap/fisheye_expand_map.txt",
+	"ver" : "1.0.0"
+}

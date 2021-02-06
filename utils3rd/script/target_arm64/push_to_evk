@@ -1,0 +1,115 @@
+#/******************************************************************************\
+#|* Copyright (c) <2020> by VeriSilicon Holdings Co., Ltd. ("VeriSilicon")     *|
+#|* All Rights Reserved.                                                       *|
+#|* Copyright (c) <2010> by Silicon Image, Inc., used with permission by       *|
+#|* VeriSilicon.                                                               *|
+#|*                                                                            *|
+#|* The material in this file is confidential and contains trade secrets of    *|
+#|* of VeriSilicon.  This is proprietary information owned or licensed by      *|
+#|* VeriSilicon.  No part of this work may be disclosed, reproduced, copied,   *|
+#|* transmitted, or used in any way for any purpose, without the express       *|
+#|* written permission of VeriSilicon.                                         *|
+#|*                                                                            *|
+#\******************************************************************************/
+
+collect_kernel_bin()
+{
+    echo "collect kernel ko binaries"
+    cp ../vvcam/v4l2/sensor/camera-proxy-driver/basler-camera-driver-vvcam.ko    ./build/runtime_folder/kernel
+    cp ../vvcam/v4l2/sensor/os08a20/os08a20.ko                                   ./build/runtime_folder/kernel
+    cp ../vvcam/v4l2/sensor/ov2775/ov2775.ko                                     ./build/runtime_folder/kernel
+    cp ../vvcam/v4l2/vvcam-isp.ko                                                ./build/runtime_folder/kernel
+    cp ../vvcam/v4l2/vvcam-dwe.ko                                                ./build/runtime_folder/kernel
+    cp ../vvcam/v4l2/video/vvcam-video.ko                                        ./build/runtime_folder/kernel
+#    cp ../nxp_kernel/build_v8/drivers/staging/media/imx/imx8-media-dev.ko        ./build/runtime_folder/kernel
+}
+
+collect_userland_runtime()
+{
+    echo "collect userland runtime for release mode"
+     if [[ -d  "./build/generated/release" ]]; then
+        collect_userland_bin_by_folder release
+    else
+        echo "skip release mode bineary collection"
+    fi
+
+    echo "collect userland runtime for debug mode"
+     if [[ -d  "./build/generated/debug" ]]; then
+        collect_userland_bin_by_folder debug
+    else
+        echo "skip debug mode bineary collection"
+    fi
+
+}
+
+collect_userland_bin_by_folder()
+{
+    for bin_path in $@
+    do
+        echo collect bin from ./build/generated/$bin_path to ./build/runtime_folder/userland/$bin_path
+        cp ./build/generated/$bin_path/bin/. ./build/runtime_folder/userland/$bin_path/ -r
+        cp ./build/generated/$bin_path/lib/. ./build/runtime_folder/userland/$bin_path/ -r
+        cp ../mediacontrol/case ./build/runtime_folder/userland/$bin_path/ -r
+    done
+}
+
+
+
+transfer_bin()
+{
+    echo "transfer mode bineary to evk boards from net..."
+    echo "transfer_bin to evk: IP:$1, folder:$2"
+    echo scp -r ./build/runtime_folder root@$1:$2
+    scp -r ./build/runtime_folder root@$1:$2
+}
+
+
+# ------------------------------------------------------------------
+# Desc:
+# ------------------------------------------------------------------
+if [[ $1 = "h" ]]; then
+    echo "command help:"
+    echo "./push_to_evk h ---> command help"
+    echo "./push_to_evk d ---> collect binaries"
+    echo "./burn.sh t IP_address folder ---> transfer binary file"
+elif [[ $1 = "d" ]]; then
+    if [[ ! -d "./build" ]]; then
+        echo "No build folder,  it firstly and make sure compile is complete"
+    else
+        if [[ -d  "./build/runtime_folder" ]]; then
+            rm ./build/runtime_folder -rf
+        fi
+            mkdir ./build/runtime_folder
+            mkdir ./build/runtime_folder/kernel
+            mkdir ./build/runtime_folder/userland
+            mkdir ./build/runtime_folder/userland/debug
+            mkdir ./build/runtime_folder/userland/release
+
+            collect_kernel_bin
+            collect_userland_runtime
+    fi
+
+elif [[ $1 = "t" ]]; then
+
+    if  [ ! -n "$2" ]; then
+        echo ip address is empty, use 'push_to_evk h' for more help
+        exit 1
+    else
+        echo IP address: $2
+    fi
+
+    if  [ ! -n "$3" ]; then
+        echo target folder is empty, use: /home/root/runtime_folder as default
+        transfer_bin $2 /home/root/runtime_folder
+    else
+        echo IP folder: $3
+        transfer_bin $2 $3
+    fi
+
+
+
+else
+    echo "wrong args, use 'push_to_evk h' for more help"
+fi
+
+

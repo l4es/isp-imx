@@ -1,0 +1,12 @@
+.vscode
+*.o
+*.ko
+*.yuv
+#*.a
+*.cmd
+build/
+BUILD/
+image/
+CMakeFiles/
+#proprietories/hal/lib/libdewarp_hal.so
+#proprietories/hal/lib/

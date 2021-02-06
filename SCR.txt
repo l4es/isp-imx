@@ -1,0 +1,27 @@
+NXP Software Content Register
+
+--------------------------------------------
+
+Package:                   verisilicon_sw_isp-*.bin
+Outgoing License:          LA_OPT_NXP_Software_License - Production Use, Section 2.3 applies
+License File:              COPYING
+Package Category:          BSP
+Type of content:           Source code
+Description and comments:  Versiliscon ISP user space driver and libraries.
+Release Location:          i.MX Yocto Project mirror
+Origin:                    NXP (proprietary)
+                           VeriSilicon Holdings Co., Ltd. (proprietary)
+                           Boost C++ Libraries (Boost Software License 1.0) - https://sourceforge.net/projects/boost/
+                           cpp-netlib (Boost Software License 1.0) - https://github.com/cpp-netlib/cpp-netlib.github.com/
+                           TinyXML2 by Lee Thomason (ZLib) - https://github.com/leethomason/tinyxml2/
+                           Android Open Source Project (Apache-2.0) - https://developer.android.com/index.html
+                           JsonCpp library (public domain) - https://github.com/open-source-parsers/jsoncpp/
+                           BZip2 Compression Library (BSD-4-clause) - https://www.nuget.org/packages/bzip2
+                           Novell, Inc. - linked-list sorting (MIT)
+                           Northwest Logic - PCI Express (MIT) - https://www.ProCodeWorks.com
+                           base64 encoding and decoding with C++ by Rene Nyffenegger (ZLib)
+                           QT (BSD-3-clause) - https://www.qt.io/developers
+                           zlib (zlib) - https://tracker.debian.org/pkg/zlib
+
+--------------------------------------------
+

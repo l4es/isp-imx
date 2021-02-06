@@ -1,0 +1,75 @@
+{
+  "caseConfig":{
+      "ID"  : "1062",
+      "path": "baseline",
+      "name": "1062_Compand.enable.image.mp",
+      "desc": "Enable expand and bls. 12 bit to 16bit.",
+      "ver" : "0.8.0",
+
+      "engineConfig":[
+          {
+              "engine": {
+                  "type": 2,
+
+                  "mainPathConfig":{
+                      "width"  : 1920 ,
+                      "height" : 1080 ,
+                      "mode"   : 4 ,
+                      "layout" : 2
+                  },
+
+                  "selfPathConfig":{
+                      "width"  : 0 ,
+                      "height" : 0 ,
+                      "mode"   : 1 ,
+                      "layout" : 2
+                  }
+              },
+
+              "verifyCurFrame"        : 1 ,
+              "frameNum"              : 1 ,
+              "enableCmpdBLS"         : 1 ,
+              "BLSPara"               : [ 64, 64, 64, 64 ] ,
+               "cmpdExpandTbl"         : [17, 16, 17, 17, 16, 17, 18, 17, 0],
+              "cmpdCompressTbl"       : [14, 14, 17, 16, 15, 19, 18, 0],
+              "enableCompress"        : 0 ,
+              "enableExpand"          : 1 ,
+              "enableTPG"             : 1 ,
+              "imageType"             : 1 ,
+              "bayerPattern"          : 0 ,
+              "colorDepth"            : 2 ,
+              "resolution"            : 0 ,
+              "pixleGap"              : 642 ,
+              "lineGap"               : 362 ,
+              "gapStandard"           : 241 ,
+              "randomSeed"            : 2863311530 ,
+              "h_total"               : 2028 ,
+              "h_fp"                  : 0 ,
+              "h_bp"                  : 0 ,
+              "h_w"                   : 100 ,
+              "h_act"                 : 1928 ,
+              "v_total"               : 1188 ,
+              "v_fp"                  : 0 ,
+              "v_bp"                  : 0 ,
+              "v_w"                   : 100 ,
+              "v_act"                 : 1088 ,
+
+              "input":{
+                  "goldenFiles": [
+                        {"fileName": "1062_Compand.enable.image.mp.00.ppm"}
+                  ],
+                  "images": [
+                      {"fileName": "RAW8_20100101_005155.pgm"}
+                  ]
+              },
+
+              "output":{
+                  "images": [
+                        {"fileName": "1062_Compand.enable.image.mp.00"}
+                  ]
+              }
+
+          }
+      ]
+  }
+}

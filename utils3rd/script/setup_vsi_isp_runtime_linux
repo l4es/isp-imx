@@ -1,0 +1,21 @@
+#/******************************************************************************\
+#|* Copyright (c) <2020> by VeriSilicon Holdings Co., Ltd. ("VeriSilicon")     *|
+#|* All Rights Reserved.                                                       *|
+#|* Copyright (c) <2010> by Silicon Image, Inc., used with permission by       *|
+#|* VeriSilicon.                                                               *|
+#|*                                                                            *|
+#|* The material in this file is confidential and contains trade secrets of    *|
+#|* of VeriSilicon.  This is proprietary information owned or licensed by      *|
+#|* VeriSilicon.  No part of this work may be disclosed, reproduced, copied,   *|
+#|* transmitted, or used in any way for any purpose, without the express       *|
+#|* written permission of VeriSilicon.                                         *|
+#|*                                                                            *|
+#\******************************************************************************/
+
+if [ ! -f "/etc/udev/rules.d/99-vivisp.rules" ]; then
+    echo "No viv udev file, creating"
+    cp 99-vivisp.rules /etc/udev/rules.d/
+else
+    echo "99-vivisp.rules exist, bypassing"
+fi
+echo "vsi_isp_runtime linux setup successfully!"

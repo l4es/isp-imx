@@ -1,0 +1,100 @@
+{
+  "?supported components" : [ "NativeIsp", "NativeDewarp", "NativeResize", "LocalDisplay", "V4l2Control", "FakeSource" ],
+
+  "using components" : [
+    {
+      "classname" : "NativeSensor",
+      "id" : "sensor0",
+      "drv_file" : "OV2775_8M_02_1080p.drv",
+      "calib_file" : "OV2775_8M_02_1080p.xml",
+      "hdr" : true,
+      "bayer" : "BGGR"
+    },
+    {
+      "classname" : "NativeDewarp",
+      "id" : "dewarp",
+      "?dewarpMode": "LENS_CORRECTION, FISHEYE_EXPAND, SPLIT_SCREEN",
+      "dewarpMode": "FISHEYE_DEWARP",
+      "scale": {
+        "roix": 0,
+        "roiy": 0,
+        "factor": 1.0
+      },
+      "split": {
+        "horizon_line": 540,
+        "vertical_line_up": 960,
+        "vertical_line_down": 960
+      },
+      "camera_matrix": [6.5516074404594690e+002,0.0, 9.6420599053623062e+002, 0.0,6.5552406676868952e+002,5.3203601317192908e+002,0.0,0.0,1.0],
+      "distortion_coeff": [-2.2095698671518085e-002,3.8543889520066955e-003,-5.9060355970132873e-003,1.9007362178503509e-003,0.0,0.0,0.0,0.0],
+      "perspective": [1.0, 0, 0, 0, 1, 0, 0, 0, 1],
+      "bypass" : true,
+      "hflip" : false
+    },
+    {
+      "classname" : "V4l2Control",
+      "id" : "v4l2"
+    },
+	{
+		"classname" : "NativeResize",
+		"id" : "vse",
+		"width": 1920,
+		"height": 1080,
+		"format": "YUV420SP",
+		"channel": 5
+	}
+  ],
+  "streams" : [
+    {
+        "links" : [
+          { "prev" : "sensor0", "srcpad" : 0, "next" : "dewarp", "sinkpad": 0 },
+          { "prev" : "dewarp", "srcpad" : 0, "next" : "v4l2", "sinkpad": 0 }
+        ],
+        "caps" : {
+          "availableStreamConfigurations" : [
+            ["YUV420SP", 1280, 720],
+            ["YUV420SP", 1920, 1080],
+            ["YUV422I", 1280, 720],
+            ["YUV422I", 1920, 1080],
+          ]
+        }
+    },
+    {
+      "links" : [
+        { "prev" : "dewarp", "srcpad" : 0, "next" : "vse", "sinkpad": 0 },
+        { "prev" : "vse", "srcpad" : 0, "next" : "v4l2", "sinkpad": 1 }
+      ],
+      "caps" : {
+        "availableStreamConfigurations" : [
+          ["YUV420SP", 4096, 2160],
+          ["YUV420SP", 1920, 1080],
+          ["YUV420SP", 1280, 720],
+          ["YUV420SP", 640,  480]
+        ]
+      }
+    },
+    {
+      "links" : [
+        { "prev" : "vse", "srcpad" : 1, "next" : "v4l2", "sinkpad": 2 }
+      ],
+      "caps" : {
+        "availableStreamConfigurations" : [
+          ["YUV420SP", 1920, 1080],
+          ["YUV420SP", 1280, 720],
+          ["YUV420SP", 640,  480]
+        ]
+      }
+    },
+    {
+      "links" : [
+        { "prev" : "vse", "srcpad" : 2, "next" : "v4l2", "sinkpad": 3 }
+      ],
+      "caps" : {
+        "availableStreamConfigurations" : [
+          ["YUV420SP", 1280, 720],
+          ["YUV420SP", 640,  480]
+        ]
+      }
+    },
+  ]
+}
